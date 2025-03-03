@@ -1,0 +1,26 @@
+/* src/components/Modal/ConfirmDeleteModal/ConfirmDeleteModal.css */
+.modal-title {
+  color: #1890ff; /* 蓝色标题 */
+  font-weight: bold;
+}
+
+.cancel-button {
+  color: #1890ff; /* 蓝色取消按钮文字 */
+  border-color: #1890ff; /* 蓝色取消按钮边框 */
+}
+
+.cancel-button:hover {
+  background-color: #e6f7ff; /* 鼠标悬停时的背景色 */
+  border-color: #1890ff; /* 鼠标悬停时的边框色 */
+}
+
+.ok-button {
+  color: #fff; /* 白色确认按钮文字 */
+  background-color: #ff4d4f; /* 红色确认按钮背景 */
+  border-color: #ff4d4f; /* 红色确认按钮边框 */
+}
+
+.ok-button:hover {
+  background-color: #ff7875; /* 鼠标悬停时的背景色 */
+  border-color: #ff7875; /* 鼠标悬停时的边框色 */
+}

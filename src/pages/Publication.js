@@ -1,0 +1,15 @@
+import React, { useEffect, useState } from "react";
+
+const Publications = () =>{
+
+
+
+
+    return(
+        <div>
+            Publications
+        </div>
+    );
+};
+
+export default Publications;
