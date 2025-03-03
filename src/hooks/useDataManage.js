@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { message } from "antd";
 
 const useDataManage = ({
+  form, // 表单实例
   createFunction = async () => {
     throw new Error("createFunction 函数未提供！");
   },
@@ -11,14 +12,24 @@ const useDataManage = ({
   fetchFunction = async () => {
     throw new Error("fetchFunction 函数未提供！");
   },
-  hasCheckFunction = false,
-  dataCheckFunction = async () => {},
   dataName = "数据",
   dataIdKey = "data_id",
+  hasFormatFunction = false, // 是否有数据检查函数
+  dataFormatFunction = async () => {}, // 检查函数
+  hasCheckFunction = false, // 是否有数据检查函数
+  dataCheckFunction = async () => {}, // 检查函数
+  hasDateTypeAttribute = false, // 是否有日期类型属性,在编辑时需要格式化日期类型数据
+  dateTypeFormatFunction = (data) => {}, // 日期类型数据格式化函数
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddingData, setIsAddingData] = useState(false);
   const [editingDataId, setEditingDataId] = useState(null);
+
+  useEffect(() => {
+    if (form) {
+      // 在这里可以使用 form 实例进行操作
+    }
+  }, [form]);
 
   const handleCreate = async (values) => {
     try {
@@ -49,7 +60,14 @@ const useDataManage = ({
     setIsAddingData(false);
   };
 
-  const handleEdit = (record) => {
+  const handleEdit = (record) => {    
+    if (hasDateTypeAttribute) {
+      record = dateTypeFormatFunction(record);
+    }
+    if (hasFormatFunction){
+        record = dateTypeFormatFunction(record);
+    }        
+    form.setFieldsValue(record);
     setEditingDataId(record[dataIdKey]);
     setIsModalOpen(true);
     setIsAddingData(false);
@@ -57,23 +75,31 @@ const useDataManage = ({
 
   const handleAdd = () => {
     setEditingDataId(null);
+    form.resetFields();
     setIsModalOpen(true);
     setIsAddingData(true);
   };
 
   const handleFinish = async (values) => {
     // 如果是添加数据，则调用 dataCheckFunction 检查数据是否符合规则
-    if (hasCheckFunction && isAddingData) {
-      const isDataOk = await dataCheckFunction(values);
+    if (hasCheckFunction && dataName !== "用户") {
+      const isDataOk = await dataCheckFunction(values);      
       if (!isDataOk) {
+        message.error("数据不符合规则，请检查！");
         return;
       }
     }
+    // 如果存在数据格式化函数，则调用 dataFormatFunction 格式化数据
+    let formattedData = values;
+    if (hasFormatFunction) {
+      formattedData = await dataFormatFunction(values);
+    }
+
     // 如果是编辑数据，则调用 handleUpdate
     if (editingDataId) {
-      handleUpdate(values);
+      handleUpdate(formattedData);
     } else {
-      handleCreate(values);
+      handleCreate(formattedData);
     }
   };
 

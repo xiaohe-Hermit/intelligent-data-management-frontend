@@ -22,6 +22,7 @@ const Users = () => {
   useEffect(() => {
     fetchUsers();
   }, []);
+  useEffect(() => {}, [form]);
 
   const fetchUsers = () => {
     getUsers().then((response) => {
@@ -67,6 +68,7 @@ const Users = () => {
     handleAdd,
     handleFinish,
   } = useDataManage({
+    form: form,
     createFunction: createUser,
     updateFunction: updateUser,
     fetchFunction: fetchUsers,

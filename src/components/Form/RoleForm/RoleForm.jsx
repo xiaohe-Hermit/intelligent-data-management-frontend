@@ -1,6 +1,6 @@
 // src/components/UserForm/UserForm.jsx
 import React from "react";
-import { Form, Input} from "antd";
+import { Form, Input } from "antd";
 
 const RoleForm = ({ form, onFinish }) => {
     return (

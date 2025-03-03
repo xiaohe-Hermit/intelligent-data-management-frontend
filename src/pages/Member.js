@@ -16,21 +16,20 @@ import DataTable from "../components/DataTable/DataTable";
 import MemberForm from "../components/Form/MemberForm/MemberForm";
 import ConfirmDeleteModal from "../components/Modal/ConfirmDeleteModal/ConfirmDeleteModal";
 import useDeleteHandler from "../hooks/useDeleteHandler";
+import useDataManage from "../hooks/useDataManage";
 
 const Members = () => {
   const [members, setMembers] = useState([]);
   const [allUserIdAndUserName, setAllUserIdAndUserName] = useState([]);
   const [allRoleName, setAllRoleName] = useState([]);
   const [form] = Form.useForm();
-  const [editingMemberId, setEditingMemberId] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isAddingMember, setIsAddingMember] = useState(false);
 
   useEffect(() => {
     fetchMembers();
     fetchAllUserIdAndUserName();
     fetchAllRoleName();
   }, []);
+  useEffect(() => {}, [form]);
 
   // 获取所有用户id和用户名
   const fetchAllUserIdAndUserName = async () => {
@@ -100,74 +99,49 @@ const Members = () => {
     idField: "member_id",
   });
 
-  const handleCreate = async (values) => {
-    try {
-      await createMember(values);
-      message.success("成员创建成功！");
-      fetchMembers();
-      form.resetFields();
-      setIsModalOpen(false);
-    } catch (error) {
-      message.error(error.message || "成员创建失败，请重试");
-    }
-  };
-
-  const handleUpdate = async (values) => {
-    try {
-      await updateMember(editingMemberId, values);
-      message.success("成员更新成功！");
-      fetchMembers();
-      form.resetFields();
-      setEditingMemberId(null);
-      setIsModalOpen(false);
-    } catch (error) {
-      message.error(error.message || "成员更新失败，请重试");
-    }
-  };
-
-  // 关闭模态框
-  const handleCancel = () => {
-    form.resetFields();
-    setEditingMemberId(null);
-    setIsModalOpen(false);
-    setIsAddingMember(false);
-  };
-
-  const handleEdit = (record) => {
-    // 将 join_date 和 leave_date 转换为 dayjs 对象
+  const dateTypeFormatFunction = (record) => {
     const formattedRecord = {
       ...record,
       join_date: dayjs(record.join_date),
       leave_date: dayjs(record.leave_date),
     };
-    form.setFieldsValue(formattedRecord);
-    setEditingMemberId(record.member_id);
-    setIsModalOpen(true);
-    setIsAddingMember(false);
+    return formattedRecord;
   };
 
-  const handleAdd = () => {
-    form.resetFields();
-    setEditingMemberId(null);
-    setIsModalOpen(true);
-    setIsAddingMember(true);
-  };
-
-  const handleFinish = async (values) => {
-    // 如果是添加成员，则调用 handleCreate
-    // 如果是编辑成员，则调用 handleUpdate
-    if (editingMemberId) {
-      handleUpdate(values);
-    } else {
-      handleCreate(values);
+  const checkUserAndUserIdMatch = async (values) => {
+    for (const user of allUserIdAndUserName) {
+      if (user.userId === values.user_id && user.userName === values.user_name) {
+        return true;
+      }
     }
+    return false;
   };
+
+  const {
+    isModalOpen,
+    isAddingData: isAddingMember,
+    handleCancel,
+    handleEdit,
+    handleAdd,
+    handleFinish,
+  } = useDataManage({
+    form: form,
+    createFunction: createMember,
+    updateFunction: updateMember,
+    fetchFunction: fetchMembers,
+    dataName: "成员",
+    dataIdKey: "member_id",
+    hasCheckFunction: true,
+    dataCheckFunction: checkUserAndUserIdMatch,
+    hasDateTypeAttribute: true,
+    dateTypeFormatFunction: dateTypeFormatFunction,
+  });
 
   // 处理用户ID变化
   const handleUserIdChange = (userId) => {
     const user = allUserIdAndUserName.find((u) => u.userId === userId);
     if (user) {
-      form.setFieldsValue({ name: user.userName });
+      form.setFieldsValue({ user_name: user.userName });
     }
   };
 

@@ -12,17 +12,16 @@ import DataTable from "../components/DataTable/DataTable";
 import PermissionForm from "../components/Form/PermissionForm/PermissionForm";
 import ConfirmDeleteModal from "../components/Modal/ConfirmDeleteModal/ConfirmDeleteModal";
 import useDeleteHandler from "../hooks/useDeleteHandler";
+import useDataManage from "../hooks/useDataManage";
 
 const Permissions = () => {
   const [permissions, setPermissions] = useState([]);
   const [form] = Form.useForm();
-  const [editingPermissionId, setEditingPermissionId] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isAddingPermission, setIsAddingPermission] = useState(false);
 
   useEffect(() => {
     fetchPermissions();
   }, []);
+  useEffect(() => {}, [form]);
 
   const fetchPermissions = () => {
     getPermissions()
@@ -53,62 +52,79 @@ const Permissions = () => {
     idField: "permission_id",
   });
 
-  const handleCreate = async (values) => {
-    try {
-      await createPermission(values);
-      message.success("权限创建成功！");
-      fetchPermissions();
-      form.resetFields();
-      setIsModalOpen(false);
-    } catch (error) {
-      message.error(error.message || "权限创建失败，请重试");
-    }
-  };
+  const {
+    isModalOpen,
+    isAddingData: isAddingPermission,
+    handleCancel,
+    handleEdit,
+    handleAdd,
+    handleFinish,
+  } = useDataManage({
+    form: form,
+    createFunction: createPermission,
+    updateFunction: updatePermission,
+    fetchFunction: fetchPermissions,
+    hasCheckFunction: false,
+    dataName: "权限",
+    dataIdKey: "permission_id",
+  });
 
-  const handleUpdate = async (values) => {
-    try {
-      await updatePermission(editingPermissionId, values);
-      message.success("权限更新成功！");
-      fetchPermissions();
-      form.resetFields();
-      setEditingPermissionId(null);
-      setIsModalOpen(false);
-    } catch (error) {
-      message.error(error.message || "权限更新失败，请重试");
-    }
-  };
+  // const handleCreate = async (values) => {
+  //   try {
+  //     await createPermission(values);
+  //     message.success("权限创建成功！");
+  //     fetchPermissions();
+  //     form.resetFields();
+  //     setIsModalOpen(false);
+  //   } catch (error) {
+  //     message.error(error.message || "权限创建失败，请重试");
+  //   }
+  // };
 
-  // 关闭模态框
-  const handleCancel = () => {
-    form.resetFields();
-    setEditingPermissionId(null);
-    setIsModalOpen(false);
-    setIsAddingPermission(false);
-  };
+  // const handleUpdate = async (values) => {
+  //   try {
+  //     await updatePermission(editingPermissionId, values);
+  //     message.success("权限更新成功！");
+  //     fetchPermissions();
+  //     form.resetFields();
+  //     setEditingPermissionId(null);
+  //     setIsModalOpen(false);
+  //   } catch (error) {
+  //     message.error(error.message || "权限更新失败，请重试");
+  //   }
+  // };
 
-  const handleEdit = (record) => {
-    form.setFieldsValue(record);
-    setEditingPermissionId(record.permission_id);
-    setIsModalOpen(true);
-    setIsAddingPermission(false);
-  };
+  // // 关闭模态框
+  // const handleCancel = () => {
+  //   form.resetFields();
+  //   setEditingPermissionId(null);
+  //   setIsModalOpen(false);
+  //   setIsAddingPermission(false);
+  // };
 
-  const handleAdd = () => {
-    form.resetFields();
-    setEditingPermissionId(null);
-    setIsModalOpen(true);
-    setIsAddingPermission(true);
-  };
+  // const handleEdit = (record) => {
+  //   form.setFieldsValue(record);
+  //   setEditingPermissionId(record.permission_id);
+  //   setIsModalOpen(true);
+  //   setIsAddingPermission(false);
+  // };
 
-  const handleFinish = async (values) => {
-    // 如果是添加权限，则调用 handleCreate
-    // 如果是编辑权限，则调用 handleUpdate
-    if (editingPermissionId) {
-      handleUpdate(values);
-    } else {
-      handleCreate(values);
-    }
-  };
+  // const handleAdd = () => {
+  //   form.resetFields();
+  //   setEditingPermissionId(null);
+  //   setIsModalOpen(true);
+  //   setIsAddingPermission(true);
+  // };
+
+  // const handleFinish = async (values) => {
+  //   // 如果是添加权限，则调用 handleCreate
+  //   // 如果是编辑权限，则调用 handleUpdate
+  //   if (editingPermissionId) {
+  //     handleUpdate(values);
+  //   } else {
+  //     handleCreate(values);
+  //   }
+  // };
 
   const columns = [
     {

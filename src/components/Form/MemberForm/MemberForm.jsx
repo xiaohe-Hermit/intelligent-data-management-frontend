@@ -26,7 +26,7 @@ const MemberForm = ({
                 </Select>
             </Form.Item>
             <Form.Item
-                name="name"
+                name="user_name"
                 label="姓名"
                 rules={[{ required: true, message: "请选择用户姓名" }]}
             >
