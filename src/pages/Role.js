@@ -12,13 +12,15 @@ import RoleForm from "../components/Form/RoleForm/RoleForm";
 import DataTable from "../components/DataTable/DataTable";
 import ConfirmDeleteModal from "../components/Modal/ConfirmDeleteModal/ConfirmDeleteModal";
 import useDeleteHandler from "../hooks/useDeleteHandler";
+import useDataManage from "../hooks/useDataManage";
+
 
 const Roles = () => {
   const [roles, setRoles] = useState([]);
   const [form] = Form.useForm();
-  const [editingRoleId, setEditingRoleId] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isAddingRole, setIsAddingRole] = useState(false);
+  // const [editingRoleId, setEditingRoleId] = useState(null);
+  // const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [isAddingRole, setIsAddingRole] = useState(false);
 
   useEffect(() => {
     fetchRoles();
@@ -53,62 +55,78 @@ const Roles = () => {
     idField: "role_id",
   });
 
-  const handleCreate = async (values) => {
-    try {
-      await createRole(values);
-      message.success("角色创建成功！");
-      fetchRoles();
-      form.resetFields();
-      setIsModalOpen(false);
-    } catch (error) {
-      message.error(error.message || "角色创建失败，请重试");
-    }
-  };
+  const {
+    isModalOpen,
+    isAddingData: isAddingRole,
+    handleCancel,
+    handleEdit,
+    handleAdd,
+    handleFinish,
+  } = useDataManage({
+    createFunction: createRole,
+    updateFunction: updateRole,
+    fetchFunction: fetchRoles,
+    hasCheckFunction: false,
+    dataName: "角色",
+    dataIdKey: "role_id",
+  });
 
-  const handleUpdate = async (values) => {
-    try {
-      await updateRole(editingRoleId, values);
-      message.success("角色更新成功！");
-      fetchRoles();
-      form.resetFields();
-      setEditingRoleId(null);
-      setIsModalOpen(false);
-    } catch (error) {
-      message.error(error.message || "角色更新失败，请重试");
-    }
-  };
+  // const handleCreate = async (values) => {
+  //   try {
+  //     await createRole(values);
+  //     message.success("角色创建成功！");
+  //     fetchRoles();
+  //     form.resetFields();
+  //     setIsModalOpen(false);
+  //   } catch (error) {
+  //     message.error(error.message || "角色创建失败，请重试");
+  //   }
+  // };
 
-  // 关闭模态框
-  const handleCancel = () => {
-    form.resetFields();
-    setEditingRoleId(null);
-    setIsModalOpen(false);
-    setIsAddingRole(false);
-  };
+  // const handleUpdate = async (values) => {
+  //   try {
+  //     await updateRole(editingRoleId, values);
+  //     message.success("角色更新成功！");
+  //     fetchRoles();
+  //     form.resetFields();
+  //     setEditingRoleId(null);
+  //     setIsModalOpen(false);
+  //   } catch (error) {
+  //     message.error(error.message || "角色更新失败，请重试");
+  //   }
+  // };
 
-  const handleEdit = (record) => {
-    form.setFieldsValue(record);
-    setEditingRoleId(record.role_id);
-    setIsModalOpen(true);
-    setIsAddingRole(false);
-  };
+  // // 关闭模态框
+  // const handleCancel = () => {
+  //   form.resetFields();
+  //   setEditingRoleId(null);
+  //   setIsModalOpen(false);
+  //   setIsAddingRole(false);
+  // };
 
-  const handleAdd = () => {
-    form.resetFields();
-    setEditingRoleId(null);
-    setIsModalOpen(true);
-    setIsAddingRole(true);
-  };
+  // const handleEdit = (record) => {
+  //   form.setFieldsValue(record);
+  //   setEditingRoleId(record.role_id);
+  //   setIsModalOpen(true);
+  //   setIsAddingRole(false);
+  // };
 
-  const handleFinish = async (values) => {
-    // 如果是添加用户，则调用 handleCreate
-    // 如果是编辑用户，则调用 handleUpdate
-    if (editingRoleId) {
-      handleUpdate(values);
-    } else {
-      handleCreate(values);
-    }
-  };
+  // const handleAdd = () => {
+  //   form.resetFields();
+  //   setEditingRoleId(null);
+  //   setIsModalOpen(true);
+  //   setIsAddingRole(true);
+  // };
+
+  // const handleFinish = async (values) => {
+  //   // 如果是添加用户，则调用 handleCreate
+  //   // 如果是编辑用户，则调用 handleUpdate
+  //   if (editingRoleId) {
+  //     handleUpdate(values);
+  //   } else {
+  //     handleCreate(values);
+  //   }
+  // };
 
   const columns = [
     {
