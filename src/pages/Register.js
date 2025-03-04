@@ -1,5 +1,5 @@
 // src/pages/Register.js
-import React, { useState , useRef } from "react";
+import React, { useState , useRef, useEffect } from "react";
 import { Form, Input, Button, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useNavigate, Link } from "react-router-dom"; // 导入 Link 组件
@@ -20,6 +20,9 @@ const Register = () => {
   const navigate = useNavigate();
   // 使用useRef获取Form实例
   const formRef = useRef();
+  useEffect(() => {
+    document.title = "注册页";
+  }, []);
 
   /**
    * 注册表单提交时的处理函数

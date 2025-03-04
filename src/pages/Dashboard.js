@@ -1,15 +1,14 @@
 // src/pages/Dashboard.js
-import React, { useEffect} from 'react';
+import React, { useEffect } from "react";
 
 /**
  * Dashboard组件用于渲染仪表盘页面
  * 该组件会从后端获取信息和用户数据，并展示在页面上
  */
 const Dashboard = () => {
-
   // 使用useEffect钩子在组件挂载时获取数据
   useEffect(() => {
-    
+    document.title = "智能数据管理系统";
   }, []);
 
   // 渲染仪表盘页面
