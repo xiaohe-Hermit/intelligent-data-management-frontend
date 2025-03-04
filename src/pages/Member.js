@@ -7,10 +7,12 @@ import {
   createMember,
   updateMember,
   deleteMember,
+} from "../services/memberApi";
+import {
   getUserNameByUserId,
   getAllUserIdAndUserName,
-  getAllRoleName,
-} from "../services/memberApi";
+} from "../services/userApi";
+import { getAllRoleName } from "../services/roleApi";
 import CustomModal from "../components/Modal/CustomModal/CustomModal";
 import DataTable from "../components/DataTable/DataTable";
 import MemberForm from "../components/Form/MemberForm/MemberForm";

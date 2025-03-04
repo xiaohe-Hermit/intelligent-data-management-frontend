@@ -5,9 +5,15 @@ import {
   createPhoto,
   updatePhoto,
   deletePhoto,
-  getAllUserIdAndUserName,
-  getUserNameByUserId,
 } from "../services/photoApi";
+import {
+  getUserNameByUserId,
+  getAllUserIdAndUserName,
+} from "../services/userApi";
+import {
+  getAllProjectIdAndProjectName,
+  getProjectNameByProjectId,
+} from "../services/projectApi";
 import CustomModal from "../components/Modal/CustomModal/CustomModal";
 import DataTable from "../components/DataTable/DataTable";
 import PhotoForm from "../components/Form/PhotoForm/PhotoForm";
@@ -17,11 +23,15 @@ import useDataManage from "../hooks/useDataManage";
 const Photos = () => {
   const [photos, setPhotos] = useState([]);
   const [allUserIdAndUserName, setAllUserIdAndUserName] = useState([]);
+  const [allProjectIdAndProjectName, setAllProjectIdAndProjectName] = useState(
+    []
+  );
   const [form] = Form.useForm();
 
   useEffect(() => {
     fetchPhotos();
     fetchAllUserIdAndUserName();
+    fetchAllProjectIdAndProjectName();
   }, []);
   useEffect(() => {}, [form]);
 
@@ -40,25 +50,43 @@ const Photos = () => {
     }
   };
 
+  // 获取所有项目id和项目名
+  const fetchAllProjectIdAndProjectName = async () => {
+    try {
+      const allProjectIdAndProjectName = await getAllProjectIdAndProjectName();
+      if (Array.isArray(allProjectIdAndProjectName)) {
+        setAllProjectIdAndProjectName(allProjectIdAndProjectName);
+      } else {
+        setAllProjectIdAndProjectName([]);
+        message.error("获取项目数据格式不正确");
+      }
+    } catch (error) {
+      console.error("获取项目失败:", error);
+      message.error("获取项目失败，请重试");
+    }
+  };
   // 修改后的 fetchPhotos 函数
   const fetchPhotos = async () => {
     try {
       const response = await getPhotos();
-      console.log(response);
-      
       if (Array.isArray(response)) {
         const updatedPhotos = await Promise.all(
           response.map(async (photo) => {
             if (photo.user_id) {
               const userName = await getUserNameByUserId(photo.user_id);
+              const projectName = await getProjectNameByProjectId(
+                photo.project_id
+              );
               return {
                 ...photo,
                 user_name: userName,
+                project_name: projectName,
               };
             } else {
               return {
                 ...photo,
                 user_name: "无",
+                project_name: "无",
               };
             }
           })
@@ -88,18 +116,30 @@ const Photos = () => {
   });
 
   const dataFormatFunction = async (data) => {
-    let userId = null;
-    for (const user of allUserIdAndUserName) {
-      if (data.user_name == user.userName) {
-        userId = user.userId;
+    let userId = data.user_id || null;
+    let projectId = data.project_id || null;    
+    if (!data.user_id) {                
+      for (const user of allUserIdAndUserName) {
+        if (data.user_name === user.userName) {
+          userId = user.userId;
+          break;
+        }
+      }
+    }
+    if (!data.project_id) {
+      for (const project of allProjectIdAndProjectName) {
+        if (data.project_name == project.projectName) {
+          projectId = project.projectId;
+          break;
+        }
       }
     }
     const formattedData = {
       ...data,
       user_id: userId,
-      // project_id: projectId,
+      project_id: projectId,
     };
-    const { user_name, ...finalData } = formattedData;
+    const {...finalData } = formattedData;
     return finalData;
   };
 
@@ -122,47 +162,47 @@ const Photos = () => {
   });
 
   const columns = [
-      {
-        title: "照片名称",
-        dataIndex: "photo_name",
-        key: "photo_name",
-      },
-  
-      {
-        title: "照片路径",
-        dataIndex: "photo_url",
-        key: "photo_url",
-      },
-      {
-        title: "描述",
-        dataIndex: "description",
-        key: "description",
-      },
-      {
-        title: "获得者",
-        dataIndex: "user_name",
-        key: "user_name",
-      },
-      {
-        title: "照片名称",
-        dataIndex: "project_name",
-        key: "project_name",
-      },
-      {
-        title: "Action",
-        key: "action",
-        render: (text, record) => (
-          <div>
-            <Button type="link" onClick={() => handleEdit(record)}>
-              编辑
-            </Button>
-            <Button type="link" onClick={() => handleDelete(record)}>
-              删除
-            </Button>
-          </div>
-        ),
-      },
-    ];
+    {
+      title: "照片名称",
+      dataIndex: "photo_name",
+      key: "photo_name",
+    },
+
+    {
+      title: "照片路径",
+      dataIndex: "photo_url",
+      key: "photo_url",
+    },
+    {
+      title: "描述",
+      dataIndex: "description",
+      key: "description",
+    },
+    {
+      title: "获得者",
+      dataIndex: "user_name",
+      key: "user_name",
+    },
+    {
+      title: "项目名称",
+      dataIndex: "project_name",
+      key: "project_name",
+    },
+    {
+      title: "操作",
+      key: "action",
+      render: (text, record) => (
+        <div>
+          <Button type="link" onClick={() => handleEdit(record)}>
+            编辑
+          </Button>
+          <Button type="link" onClick={() => handleDelete(record)}>
+            删除
+          </Button>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div>
@@ -185,6 +225,7 @@ const Photos = () => {
           form={form}
           onFinish={handleFinish}
           allUserIdAndUserName={allUserIdAndUserName}
+          allProjectIdAndProjectName={allProjectIdAndProjectName}
         />
       </CustomModal>
       <ConfirmDeleteModal

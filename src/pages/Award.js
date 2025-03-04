@@ -6,9 +6,15 @@ import {
   createAward,
   updateAward,
   deleteAward,
-  getAllUserIdAndUserName,
-  getUserNameByUserId,
 } from "../services/awardApi";
+import {
+  getUserNameByUserId,
+  getAllUserIdAndUserName,
+} from "../services/userApi";
+import {
+  getAllProjectIdAndProjectName,
+  getProjectNameByProjectId,
+} from "../services/projectApi";
 import CustomModal from "../components/Modal/CustomModal/CustomModal";
 import DataTable from "../components/DataTable/DataTable";
 import AwardForm from "../components/Form/AwardForm/AwardForm";
@@ -18,11 +24,16 @@ import useDataManage from "../hooks/useDataManage";
 const Awards = () => {
   const [awards, setAwards] = useState([]);
   const [allUserIdAndUserName, setAllUserIdAndUserName] = useState([]);
+  const [allProjectIdAndProjectName, setAllProjectIdAndProjectName] = useState(
+    []
+  );
+
   const [form] = Form.useForm();
 
   useEffect(() => {
     fetchAwards();
     fetchAllUserIdAndUserName();
+    fetchAllProjectIdAndProjectName();
   }, []);
   useEffect(() => {}, [form]);
 
@@ -40,6 +51,21 @@ const Awards = () => {
       console.error("获取用户失败:", error);
     }
   };
+  // 获取所有项目id和项目名
+  const fetchAllProjectIdAndProjectName = async () => {
+    try {
+      const allProjectIdAndProjectName = await getAllProjectIdAndProjectName();
+      if (Array.isArray(allProjectIdAndProjectName)) {
+        setAllProjectIdAndProjectName(allProjectIdAndProjectName);
+      } else {
+        setAllProjectIdAndProjectName([]);
+        message.error("获取项目数据格式不正确");
+      }
+    } catch (error) {
+      console.error("获取项目失败:", error);
+      message.error("获取项目失败，请重试");
+    }
+  };
 
   // 修改后的 fetchAwards 函数
   const fetchAwards = async () => {
@@ -50,14 +76,19 @@ const Awards = () => {
           response.map(async (award) => {
             if (award.user_id) {
               const userName = await getUserNameByUserId(award.user_id);
+              const projectName = await getProjectNameByProjectId(
+                award.project_id
+              );
               return {
                 ...award,
                 user_name: userName,
+                project_name: projectName,
               };
             } else {
               return {
                 ...award,
                 user_name: "无",
+                project_name: "无",
               };
             }
           })
@@ -87,18 +118,30 @@ const Awards = () => {
   });
 
   const dataFormatFunction = async (data) => {
-    let userId = null;
-    for (const user of allUserIdAndUserName) {
-      if (data.user_name == user.userName) {
-        userId = user.userId;
+    let userId = data.user_id || null;
+    let projectId = data.project_id || null;    
+    if (!data.user_id) {                
+      for (const user of allUserIdAndUserName) {
+        if (data.user_name === user.userName) {
+          userId = user.userId;
+          break;
+        }
+      }
+    }
+    if (!data.project_id) {
+      for (const project of allProjectIdAndProjectName) {
+        if (data.project_name == project.projectName) {
+          projectId = project.projectId;
+          break;
+        }
       }
     }
     const formattedData = {
       ...data,
       user_id: userId,
-      // project_id: projectId,
+      project_id: projectId,
     };
-    const { user_name, ...finalData } = formattedData;
+    const {...finalData } = formattedData;
     return finalData;
   };
   const dateTypeFormatFunction = (record) => {
@@ -161,7 +204,7 @@ const Awards = () => {
       key: "user_name",
     },
     {
-      title: "奖项名称",
+      title: "项目名称",
       dataIndex: "project_name",
       key: "project_name",
     },
@@ -201,6 +244,7 @@ const Awards = () => {
         <AwardForm
           form={form}
           onFinish={handleFinish}
+          allProjectIdAndProjectName={allProjectIdAndProjectName}
           allUserIdAndUserName={allUserIdAndUserName}
         />
       </CustomModal>

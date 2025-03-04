@@ -14,7 +14,10 @@ const DataTable = ({
             <Button type="primary" onClick={onClick}>
                 添加{dataText}
             </Button>
-            <Table dataSource={dataSource} columns={columns} rowKey={row_key} className="dataTable" />
+            <Table dataSource={dataSource}
+                columns={columns}
+                rowKey={row_key}
+                className="dataTable" />
         </div>
 
     );

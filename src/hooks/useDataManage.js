@@ -60,13 +60,13 @@ const useDataManage = ({
     setIsAddingData(false);
   };
 
-  const handleEdit = (record) => {    
-    if (hasDateTypeAttribute) {
+  const handleEdit = async (record) => {    
+    if (hasDateTypeAttribute) {        
       record = dateTypeFormatFunction(record);
     }
-    if (hasFormatFunction){
-        record = dateTypeFormatFunction(record);
-    }        
+    if (hasFormatFunction) {
+      record = await dataFormatFunction(record);
+    }    
     form.setFieldsValue(record);
     setEditingDataId(record[dataIdKey]);
     setIsModalOpen(true);
@@ -83,7 +83,7 @@ const useDataManage = ({
   const handleFinish = async (values) => {
     // 如果是添加数据，则调用 dataCheckFunction 检查数据是否符合规则
     if (hasCheckFunction && dataName !== "用户") {
-      const isDataOk = await dataCheckFunction(values);      
+      const isDataOk = await dataCheckFunction(values);
       if (!isDataOk) {
         message.error("数据不符合规则，请检查！");
         return;
@@ -93,8 +93,7 @@ const useDataManage = ({
     let formattedData = values;
     if (hasFormatFunction) {
       formattedData = await dataFormatFunction(values);
-    }
-
+    }    
     // 如果是编辑数据，则调用 handleUpdate
     if (editingDataId) {
       handleUpdate(formattedData);

@@ -11,24 +11,25 @@ const SoftwareCopyrightForm = ({
         <Form form={form} layout="vertical" onFinish={onFinish}>
             <Form.Item
                 name="software_name"
-                label="沙龙名称"
-                rules={[{ required: true, message: "请选择沙龙名称" }]}
+                label="软著名称"
+                rules={[{ required: true, message: "请选择软著名称" }]}
             >
                 <Input placeholder="请输入" />
             </Form.Item>
+
             <Form.Item
                 name="copyright_number"
-                label="日期"
-                rules={[{ required: true, message: "请选择日期" }]}
+                label="版权号"
+                rules={[{ required: true, message: "请选择版权号" }]}
             >
-                <DatePicker />
+                <Input placeholder="请输入" />
             </Form.Item>
             <Form.Item
                 name="registration_date"
-                label="地点"
-                rules={[{ required: true, message: "请选择地点" }]}
+                label="注册时间"
+                rules={[{ required: true, message: "请选择注册时间" }]}
             >
-                <Input placeholder="请输入" />
+                <DatePicker />
             </Form.Item>
             <Form.Item
                 name="description"

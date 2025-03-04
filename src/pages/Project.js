@@ -6,9 +6,11 @@ import {
   createProject,
   updateProject,
   deleteProject,
+} from "../services/projectApi";
+import {
   getUserNameByUserId,
   getAllUserIdAndUserName,
-} from "../services/projectApi";
+} from "../services/userApi";
 import CustomModal from "../components/Modal/CustomModal/CustomModal";
 import DataTable from "../components/DataTable/DataTable";
 import ProjectForm from "../components/Form/ProjectForm/ProjectForm";

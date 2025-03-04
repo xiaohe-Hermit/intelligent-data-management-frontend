@@ -52,3 +52,18 @@ export const deleteRole = async (roleId) => {
     throw error.response ? error.response.data : error.message;
   }
 };
+
+// 获取所有的角色名
+export const getAllRoleName = async () => {
+  try {
+    const response = await api.get("/roles");
+    const roles = response.data.data;    
+    const roleName = roles.map((role) => ({
+      roleId: role.role_id,
+      roleName: role.role_name,
+    }));
+    return roleName;
+  } catch (error) {
+    console.error("获取角色名失败:", error);
+  }
+}

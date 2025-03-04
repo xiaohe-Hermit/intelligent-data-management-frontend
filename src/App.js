@@ -1,5 +1,5 @@
 // src/App.js
-import React, { useState, useEffect } from "react";
+import React, { useState} from "react";
 import { Layout, Menu, Avatar, Button } from "antd";
 import {
   BrowserRouter as Router,
@@ -34,11 +34,6 @@ function App() {
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
-
-  useEffect(() => {
-    document.title = "智能数据管理系统";
-  }, []); 
-
   // 保护路由的组件
   const ProtectedRoute = ({ children }) => {
     if (!isLoggedIn) {
@@ -53,51 +48,51 @@ function App() {
     const menuItems = [
       {
         key: "1",
-        label: <Link to="/">Dashboard</Link>,
+        label: <Link to="/">主页</Link>,
       },
       {
         key: "2",
-        label: <Link to="/users">Users</Link>,
+        label: <Link to="/users">用户管理</Link>,
       },
       {
         key: "3",
-        label: <Link to="/roles">Roles</Link>,
+        label: <Link to="/roles">角色管理</Link>,
       },
       {
         key: "4",
-        label: <Link to="/permissions">Permissions</Link>,
+        label: <Link to="/permissions">权限管理</Link>,
       },
       {
         key: "5",
-        label: <Link to="/members">Members</Link>,
+        label: <Link to="/members">成员管理</Link>,
       },
       {
         key: "6",
-        label: <Link to="/projects">Projects</Link>,
+        label: <Link to="/projects">项目管理</Link>,
       },
       {
         key: "7",
-        label: <Link to="/photos">Photos</Link>,
+        label: <Link to="/photos">图片管理</Link>,
       },
       {
         key: "8",
-        label: <Link to="/awards">Awards</Link>,
+        label: <Link to="/awards">获奖管理</Link>,
       },
       {
         key: "9",
-        label: <Link to="/publications">Publications</Link>,
+        label: <Link to="/publications">出版物管理</Link>,
       },
       {
         key: "10",
-        label: <Link to="/patents">Patents</Link>,
+        label: <Link to="/patents">专利管理</Link>,
       },
       {
         key: "11",
-        label: <Link to="/salons">Salons</Link>,
+        label: <Link to="/salons">沙龙管理</Link>,
       },
       {
         key: "12",
-        label: <Link to="/software-copyrights">SoftwareCopyrights</Link>,
+        label: <Link to="/software-copyrights">软著管理</Link>,
       },
     ];
 

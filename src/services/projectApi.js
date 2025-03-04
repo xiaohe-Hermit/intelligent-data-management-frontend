@@ -52,31 +52,30 @@ export const deleteProject = async (projectId) => {
   }
 };
 
-export const getUserNameByUserId = async (userId) => {
+// 获取所有项目ID与名称
+export const getAllProjectIdAndProjectName = async () => {
   try {
-    const response = await api.get(`/user/${userId}`);
-    const user = response.data;
-    if (!user.data.name) {
-      throw new Error("用户名不存在");
+    const response = await api.get("/projects");
+    const projects = response.data.data;    
+    const projectIdAndProjectName = projects.map((project) => ({
+      projectId: project.project_id,
+      projectName: project.project_name,
+    }));        
+    return projectIdAndProjectName;
+  } catch (error) {
+    console.error("获取项目名和ID失败:", error);
+  }
+};
+// 根据项目ID获取项目名
+export const getProjectNameByProjectId = async (projectId) => {
+  try {
+    const response = await api.get(`/projects/${projectId}`);
+    const project = response.data.data;
+    if (!project.project_name) {
+      throw new Error("项目名不存在");
     }
-    return user.data.name;
+    return project.project_name;
   } catch (error) {
-    console.error("获取用户名失败:", error);
-    throw error.response ? error.response.data : error.message;
+    console.error("获取项目名失败:", error);
   }
-};
-// 获取所有用户名和ID
-export const getAllUserIdAndUserName = async () => {
-  try {
-    const response = await api.get("/user");
-    const users = response.data;
-    const userIdAndUserName = users.map((user) => ({   
-      userId: user.user_id,
-      userName: user.name,
-    }));
-    return userIdAndUserName;
-  } catch (error) {
-    console.error("获取用户名和ID失败:", error);
-    throw error.response ? error.response.data : error.message;
-  }
-};
+}

@@ -6,9 +6,11 @@ import {
   createSalon,
   updateSalon,
   deleteSalon,
-  getAllUserIdAndUserName,
-  getUserNameByUserId,
 } from "../services/salonApi";
+import {
+  getUserNameByUserId,
+  getAllUserIdAndUserName,
+} from "../services/userApi";
 import CustomModal from "../components/Modal/CustomModal/CustomModal";
 import DataTable from "../components/DataTable/DataTable";
 import SalonForm from "../components/Form/SalonForm/SalonForm";
@@ -129,47 +131,47 @@ const Salons = () => {
   });
 
   const columns = [
-      {
-        title: "沙龙名称",
-        dataIndex: "salon_name",
-        key: "salon_name",
-      },
-  
-      {
-        title: "举办时间",
-        dataIndex: "salon_date",
-        key: "salon_date",
-      },
-      {
-        title: "地点",
-        dataIndex: "location",
-        key: "location",
-      },
-      {
-        title: "描述",
-        dataIndex: "description",
-        key: "description",
-      },
-      {
-        title: "沙龙负责人",
-        dataIndex: "organizer_name",
-        key: "organizer_name",
-      },
-      {
-        title: "Action",
-        key: "action",
-        render: (text, record) => (
-          <div>
-            <Button type="link" onClick={() => handleEdit(record)}>
-              编辑
-            </Button>
-            <Button type="link" onClick={() => handleDelete(record)}>
-              删除
-            </Button>
-          </div>
-        ),
-      },
-    ];
+    {
+      title: "沙龙名称",
+      dataIndex: "salon_name",
+      key: "salon_name",
+    },
+
+    {
+      title: "举办时间",
+      dataIndex: "salon_date",
+      key: "salon_date",
+    },
+    {
+      title: "地点",
+      dataIndex: "location",
+      key: "location",
+    },
+    {
+      title: "描述",
+      dataIndex: "description",
+      key: "description",
+    },
+    {
+      title: "沙龙负责人",
+      dataIndex: "organizer_name",
+      key: "organizer_name",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (text, record) => (
+        <div>
+          <Button type="link" onClick={() => handleEdit(record)}>
+            编辑
+          </Button>
+          <Button type="link" onClick={() => handleDelete(record)}>
+            删除
+          </Button>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div>

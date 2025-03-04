@@ -52,32 +52,3 @@ export const deletePhoto = async (photoId) => {
   }
 };
 
-// 获取所有用户名和ID
-export const getAllUserIdAndUserName = async () => {
-  try {
-    const response = await api.get("/user");
-    const users = response.data;
-    const userIdAndUserName = users.map((user) => ({   
-      userId: user.user_id,
-      userName: user.name,
-    }));
-    return userIdAndUserName;
-  } catch (error) {
-    console.error("获取用户名和ID失败:", error);
-    throw error.response ? error.response.data : error.message;
-  }
-};
-
-export const getUserNameByUserId = async (userId) => {
-  try {
-    const response = await api.get(`/user/${userId}`);
-    const user = response.data;
-    if (!user.data.name) {
-      throw new Error("用户名不存在");
-    }
-    return user.data.name;
-  } catch (error) {
-    console.error("获取用户名失败:", error);
-    throw error.response ? error.response.data : error.message;
-  }
-};

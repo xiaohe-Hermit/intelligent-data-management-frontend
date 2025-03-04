@@ -6,9 +6,15 @@ import {
   createPatent,
   updatePatent,
   deletePatent,
-  getAllUserIdAndUserName,
-  getUserNameByUserId,
 } from "../services/patentApi";
+import {
+  getUserNameByUserId,
+  getAllUserIdAndUserName,
+} from "../services/userApi";
+import {
+  getAllProjectIdAndProjectName,
+  getProjectNameByProjectId,
+} from "../services/projectApi";
 import CustomModal from "../components/Modal/CustomModal/CustomModal";
 import DataTable from "../components/DataTable/DataTable";
 import PatentForm from "../components/Form/PatentForm/PatentForm";
@@ -18,11 +24,15 @@ import useDataManage from "../hooks/useDataManage";
 const Patents = () => {
   const [patents, setPatents] = useState([]);
   const [allUserIdAndUserName, setAllUserIdAndUserName] = useState([]);
+  const [allProjectIdAndProjectName, setAllProjectIdAndProjectName] = useState(
+    []
+  );
   const [form] = Form.useForm();
 
   useEffect(() => {
     fetchPatents();
     fetchAllUserIdAndUserName();
+    fetchAllProjectIdAndProjectName();
   }, []);
   useEffect(() => {}, [form]);
 
@@ -40,6 +50,21 @@ const Patents = () => {
       console.error("获取用户失败:", error);
     }
   };
+  // 获取所有项目id和项目名
+  const fetchAllProjectIdAndProjectName = async () => {
+    try {
+      const allProjectIdAndProjectName = await getAllProjectIdAndProjectName();
+      if (Array.isArray(allProjectIdAndProjectName)) {
+        setAllProjectIdAndProjectName(allProjectIdAndProjectName);
+      } else {
+        setAllProjectIdAndProjectName([]);
+        message.error("获取项目数据格式不正确");
+      }
+    } catch (error) {
+      console.error("获取项目失败:", error);
+      message.error("获取项目失败，请重试");
+    }
+  };
 
   // 修改后的 fetchPatents 函数
   const fetchPatents = async () => {
@@ -50,14 +75,19 @@ const Patents = () => {
           response.map(async (patent) => {
             if (patent.user_id) {
               const userName = await getUserNameByUserId(patent.user_id);
+              const projectName = await getProjectNameByProjectId(
+                patent.project_id
+              );
               return {
                 ...patent,
                 user_name: userName,
+                project_name: projectName,
               };
             } else {
               return {
                 ...patent,
                 user_name: "无",
+                project_name: "无",
               };
             }
           })
@@ -87,18 +117,30 @@ const Patents = () => {
   });
 
   const dataFormatFunction = async (data) => {
-    let userId = null;
-    for (const user of allUserIdAndUserName) {
-      if (data.user_name == user.userName) {
-        userId = user.userId;
+    let userId = data.user_id || null;
+    let projectId = data.project_id || null;    
+    if (!data.user_id) {                
+      for (const user of allUserIdAndUserName) {
+        if (data.user_name === user.userName) {
+          userId = user.userId;
+          break;
+        }
+      }
+    }
+    if (!data.project_id) {
+      for (const project of allProjectIdAndProjectName) {
+        if (data.project_name == project.projectName) {
+          projectId = project.projectId;
+          break;
+        }
       }
     }
     const formattedData = {
       ...data,
       user_id: userId,
-      // project_id: projectId,
+      project_id: projectId,
     };
-    const { user_name, ...finalData } = formattedData;
+    const {...finalData } = formattedData;
     return finalData;
   };
   const dateTypeFormatFunction = (record) => {
@@ -131,57 +173,57 @@ const Patents = () => {
   });
 
   const columns = [
-      {
-        title: "专利名称",
-        dataIndex: "patent_name",
-        key: "patent_name",
-      },
-  
-      {
-        title: "专利号",
-        dataIndex: "patent_number",
-        key: "patent_number",
-      },
-      {
-        title: "申请日期",
-        dataIndex: "application_date",
-        key: "application_date",
-      },
-      {
-        title: "授权日期",
-        dataIndex: "authorization_date",
-        key: "authorization_date",
-      },
-      {
-        title: "描述",
-        dataIndex: "description",
-        key: "description",
-      },
-      {
-        title: "获得者",
-        dataIndex: "user_name",
-        key: "user_name",
-      },
-      {
-        title: "专利名称",
-        dataIndex: "project_name",
-        key: "project_name",
-      },
-      {
-        title: "Action",
-        key: "action",
-        render: (text, record) => (
-          <div>
-            <Button type="link" onClick={() => handleEdit(record)}>
-              编辑
-            </Button>
-            <Button type="link" onClick={() => handleDelete(record)}>
-              删除
-            </Button>
-          </div>
-        ),
-      },
-    ];
+    {
+      title: "专利名称",
+      dataIndex: "patent_name",
+      key: "patent_name",
+    },
+
+    {
+      title: "专利号",
+      dataIndex: "patent_number",
+      key: "patent_number",
+    },
+    {
+      title: "申请日期",
+      dataIndex: "application_date",
+      key: "application_date",
+    },
+    {
+      title: "授权日期",
+      dataIndex: "authorization_date",
+      key: "authorization_date",
+    },
+    {
+      title: "描述",
+      dataIndex: "description",
+      key: "description",
+    },
+    {
+      title: "获得者",
+      dataIndex: "user_name",
+      key: "user_name",
+    },
+    {
+      title: "项目名称",
+      dataIndex: "project_name",
+      key: "project_name",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (text, record) => (
+        <div>
+          <Button type="link" onClick={() => handleEdit(record)}>
+            编辑
+          </Button>
+          <Button type="link" onClick={() => handleDelete(record)}>
+            删除
+          </Button>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div>
@@ -204,6 +246,7 @@ const Patents = () => {
           form={form}
           onFinish={handleFinish}
           allUserIdAndUserName={allUserIdAndUserName}
+          allProjectIdAndProjectName={allProjectIdAndProjectName}
         />
       </CustomModal>
       <ConfirmDeleteModal
