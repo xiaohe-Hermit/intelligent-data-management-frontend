@@ -1,5 +1,5 @@
 import React from "react";
-import { Form, Select, DatePicker } from "antd";
+import { Form, Select, DatePicker, Input } from "antd";
 
 const PublicationForm = ({
     form,
@@ -36,8 +36,8 @@ const PublicationForm = ({
             </Form.Item>
             <Form.Item
                 name="publisher"
-                label="发布者"
-                rules={[{ required: true, message: "请选择发布者" }]}
+                label="出版社"
+                rules={[{ required: true, message: "请选择出版社" }]}
             >
                 <Select>
                     {allUserIdAndUserName.map((user) => (

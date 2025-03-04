@@ -67,3 +67,17 @@ export const getAllUserIdAndUserName = async () => {
     throw error.response ? error.response.data : error.message;
   }
 };
+
+export const getUserNameByUserId = async (userId) => {
+  try {
+    const response = await api.get(`/user/${userId}`);
+    const user = response.data;
+    if (!user.data.name) {
+      throw new Error("用户名不存在");
+    }
+    return user.data.name;
+  } catch (error) {
+    console.error("获取用户名失败:", error);
+    throw error.response ? error.response.data : error.message;
+  }
+};

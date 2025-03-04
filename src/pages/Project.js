@@ -55,10 +55,10 @@ const Projects = () => {
                 manager_name: userName,
               };
             } else {
-                return {
-                  ...project,
-                  manager_name: "无",
-                };
+              return {
+                ...project,
+                manager_name: "无",
+              };
             }
           })
         );
@@ -108,6 +108,7 @@ const Projects = () => {
     };
     return formattedRecord;
   };
+
   const {
     isModalOpen,
     isAddingData: isAddingProject,
