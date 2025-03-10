@@ -1,28 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { Form, Button, message } from "antd";
-import dayjs from "dayjs"; // 确保导入 dayjs
 import {
-  getSoftwareCopyrights,
-  createSoftwareCopyright,
-  updateSoftwareCopyright,
-  deleteSoftwareCopyright,
-} from "../services/softwareCopyrightApi";
+  getPhotos,
+  createPhoto,
+  updatePhoto,
+  deletePhoto,
+} from "../../../services/photoApi";
 import {
   getUserNameByUserId,
   getAllUserIdAndUserName,
-} from "../services/userApi";
+} from "../../../services/userApi";
 import {
   getAllProjectIdAndProjectName,
   getProjectNameByProjectId,
-} from "../services/projectApi";
-import CustomModal from "../components/Modal/CustomModal/CustomModal";
-import DataTable from "../components/DataTable/DataTable";
-import SoftwareCopyrightForm from "../components/Form/SoftwareCopyrightForm/SoftwareCopyrightForm";
-import ConfirmDeleteModal from "../components/Modal/ConfirmDeleteModal/ConfirmDeleteModal";
-import useDeleteHandler from "../hooks/useDeleteHandler";
-import useDataManage from "../hooks/useDataManage";
-const SoftwareCopyrights = () => {
-  const [softwareCopyrights, setSoftwareCopyrights] = useState([]);
+} from "../../../services/projectApi";
+import CustomModal from "../../../components/Modal/CustomModal/CustomModal";
+import DataTable from "../../../components/DataTable/DataTable";
+import PhotoForm from "../../../components/Form/PhotoForm/PhotoForm";
+import ConfirmDeleteModal from "../../../components/Modal/ConfirmDeleteModal/ConfirmDeleteModal";
+import useDeleteHandler from "../../../hooks/useDeleteHandler";
+import useDataManage from "../../../hooks/useDataManage";
+const PhotosPage = () => {
+  const [photos, setPhotos] = useState([]);
   const [allUserIdAndUserName, setAllUserIdAndUserName] = useState([]);
   const [allProjectIdAndProjectName, setAllProjectIdAndProjectName] = useState(
     []
@@ -30,7 +29,7 @@ const SoftwareCopyrights = () => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    fetchSoftwareCopyrights();
+    fetchPhotos();
     fetchAllUserIdAndUserName();
     fetchAllProjectIdAndProjectName();
   }, []);
@@ -50,6 +49,7 @@ const SoftwareCopyrights = () => {
       console.error("获取用户失败:", error);
     }
   };
+
   // 获取所有项目id和项目名
   const fetchAllProjectIdAndProjectName = async () => {
     try {
@@ -65,41 +65,40 @@ const SoftwareCopyrights = () => {
       message.error("获取项目失败，请重试");
     }
   };
-
-  // 修改后的 fetchSoftwareCopyrights 函数
-  const fetchSoftwareCopyrights = async () => {
+  // 修改后的 fetchPhotos 函数
+  const fetchPhotos = async () => {
     try {
-      const response = await getSoftwareCopyrights();
+      const response = await getPhotos();
       if (Array.isArray(response)) {
-        const updatedSoftwareCopyrights = await Promise.all(
-          response.map(async (softwareCopyright) => {
-            if (softwareCopyright.user_id) {
-              const userName = await getUserNameByUserId(softwareCopyright.user_id);
+        const updatedPhotos = await Promise.all(
+          response.map(async (photo) => {
+            if (photo.user_id) {
+              const userName = await getUserNameByUserId(photo.user_id);
               const projectName = await getProjectNameByProjectId(
-                softwareCopyright.project_id
+                photo.project_id
               );
               return {
-                ...softwareCopyright,
+                ...photo,
                 user_name: userName,
                 project_name: projectName,
               };
             } else {
               return {
-                ...softwareCopyright,
+                ...photo,
                 user_name: "无",
                 project_name: "无",
               };
             }
           })
         );
-        setSoftwareCopyrights(updatedSoftwareCopyrights);
+        setPhotos(updatedPhotos);
       } else {
-        setSoftwareCopyrights([]);
-        message.error("获取软著数据格式不正确");
+        setPhotos([]);
+        message.error("获取照片数据格式不正确");
       }
     } catch (error) {
-      console.error("获取软著失败:", error);
-      message.error("获取软著失败，请重试");
+      console.error("获取照片失败:", error);
+      message.error("获取照片失败，请重试");
     }
   };
 
@@ -109,11 +108,11 @@ const SoftwareCopyrights = () => {
     handleConfirmDelete,
     handleCancelDelete,
   } = useDeleteHandler({
-    deleteFunction: deleteSoftwareCopyright,
-    fetchFunction: fetchSoftwareCopyrights,
-    successMessage: "删除软著成功！",
-    errorMessage: "删除软著失败，请重试",
-    idField: "copyright_id",
+    deleteFunction: deletePhoto,
+    fetchFunction: fetchPhotos,
+    successMessage: "删除照片成功！",
+    errorMessage: "删除照片失败，请重试",
+    idField: "photo_id",
   });
 
   const dataFormatFunction = async (data) => {
@@ -129,7 +128,7 @@ const SoftwareCopyrights = () => {
     }
     if (!data.project_id) {
       for (const project of allProjectIdAndProjectName) {
-        if (data.project_name == project.projectName) {
+        if (data.project_name === project.projectName) {
           projectId = project.projectId;
           break;
         }
@@ -143,50 +142,36 @@ const SoftwareCopyrights = () => {
     const {...finalData } = formattedData;
     return finalData;
   };
-  const dateTypeFormatFunction = (record) => {
-    const formattedRecord = {
-      ...record,
-      registration_date: dayjs(record.registration_date),
-    };    
-    return formattedRecord;
-  };
 
   const {
     isModalOpen,
-    isAddingData: isAddingSoftwareCopyright,
+    isAddingData: isAddingPhoto,
     handleCancel,
     handleEdit,
     handleAdd,
     handleFinish,
   } = useDataManage({
     form: form,
-    createFunction: createSoftwareCopyright,
-    updateFunction: updateSoftwareCopyright,
-    fetchFunction: fetchSoftwareCopyrights,
-    dataName: "软著",
-    dataIdKey: "copyright_id",
+    createFunction: createPhoto,
+    updateFunction: updatePhoto,
+    fetchFunction: fetchPhotos,
+    dataName: "照片",
+    dataIdKey: "photo_id",
     hasFormatFunction: true,
     dataFormatFunction: dataFormatFunction,
-    hasDateTypeAttribute: true,
-    dateTypeFormatFunction: dateTypeFormatFunction,
   });
 
   const columns = [
     {
-      title: "软著名称",
-      dataIndex: "software_name",
-      key: "software_name",
+      title: "照片名称",
+      dataIndex: "photo_name",
+      key: "photo_name",
     },
 
     {
-      title: "版权号",
-      dataIndex: "copyright_number",
-      key: "copyright_number",
-    },
-    {
-      title: "注册时间",
-      dataIndex: "registration_date",
-      key: "registration_date",
+      title: "照片路径",
+      dataIndex: "photo_url",
+      key: "photo_url",
     },
     {
       title: "描述",
@@ -194,7 +179,7 @@ const SoftwareCopyrights = () => {
       key: "description",
     },
     {
-      title: "拥有者",
+      title: "获得者",
       dataIndex: "user_name",
       key: "user_name",
     },
@@ -204,7 +189,7 @@ const SoftwareCopyrights = () => {
       key: "project_name",
     },
     {
-      title: "Action",
+      title: "操作",
       key: "action",
       render: (text, record) => (
         <div>
@@ -222,21 +207,21 @@ const SoftwareCopyrights = () => {
   return (
     <div>
       <DataTable
-        dataText="软著"
-        dataSource={softwareCopyrights}
+        dataText="照片"
+        dataSource={photos}
         columns={columns}
-        row_key="copyright_id"
+        row_key="photo_id"
         onClick={handleAdd}
       />
       <CustomModal
-        title={isAddingSoftwareCopyright ? "添加软著" : "更新软著"}
+        title={isAddingPhoto ? "添加照片" : "更新照片"}
         open={isModalOpen}
         onCancel={handleCancel}
         onFinish={handleFinish}
         form={form}
-        submitButtonText={isAddingSoftwareCopyright ? "添加软著" : "更新软著"}
+        submitButtonText={isAddingPhoto ? "添加照片" : "更新照片"}
       >
-        <SoftwareCopyrightForm
+        <PhotoForm
           form={form}
           onFinish={handleFinish}
           allUserIdAndUserName={allUserIdAndUserName}
@@ -244,8 +229,8 @@ const SoftwareCopyrights = () => {
         />
       </CustomModal>
       <ConfirmDeleteModal
-        title="删除软著"
-        description={`确定要删除该软著吗？`}
+        title="删除照片"
+        description={`确定要删除该照片吗？`}
         open={isDeleteModalOpen}
         onCancel={handleCancelDelete}
         onOk={handleConfirmDelete}
@@ -254,4 +239,4 @@ const SoftwareCopyrights = () => {
   );
 };
 
-export default SoftwareCopyrights;
+export default PhotosPage;

@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Form, Input, Button, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { login } from "../services/loginApi"; // 导入登录 API
+import { login } from "../../services/loginApi"; // 导入登录 API
 
-const Login = ({ onLogin }) => {
+const LoginPage = ({ onLogin }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
@@ -84,4 +84,4 @@ const Login = ({ onLogin }) => {
   );
 };
 
-export default Login;
+export default LoginPage;

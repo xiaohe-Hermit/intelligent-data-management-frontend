@@ -6,15 +6,15 @@ import {
   createPermission,
   updatePermission,
   deletePermission,
-} from "../services/permissionApi";
-import CustomModal from "../components/Modal/CustomModal/CustomModal";
-import DataTable from "../components/DataTable/DataTable";
-import PermissionForm from "../components/Form/PermissionForm/PermissionForm";
-import ConfirmDeleteModal from "../components/Modal/ConfirmDeleteModal/ConfirmDeleteModal";
-import useDeleteHandler from "../hooks/useDeleteHandler";
-import useDataManage from "../hooks/useDataManage";
+} from "../../../services/permissionApi";
+import CustomModal from "../../../components/Modal/CustomModal/CustomModal";
+import DataTable from "../../../components/DataTable/DataTable";
+import PermissionForm from "../../../components/Form/PermissionForm/PermissionForm";
+import ConfirmDeleteModal from "../../../components/Modal/ConfirmDeleteModal/ConfirmDeleteModal";
+import useDeleteHandler from "../../../hooks/useDeleteHandler";
+import useDataManage from "../../../hooks/useDataManage";
 
-const Permissions = () => {
+const PermissionsPage = () => {
   const [permissions, setPermissions] = useState([]);
   const [form] = Form.useForm();
 
@@ -184,4 +184,4 @@ const Permissions = () => {
   );
 };
 
-export default Permissions;
+export default PermissionsPage;

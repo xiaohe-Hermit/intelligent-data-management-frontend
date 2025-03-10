@@ -6,14 +6,14 @@ import { useNavigate, Link } from "react-router-dom"; // 导入 Link 组件
 import {
   register,
   checkUsernameAndPhoneAvailability,
-} from "../services/registerApi"; // 假设有一个注册 API 和唯一性检查 API
+} from "../../services/registerApi"; // 假设有一个注册 API 和唯一性检查 API
 
 /**
  * 注册组件
  * 该组件用于用户注册，包含一个表单，用户可以在表单中输入用户名、手机号、密码和确认密码进行注册
  * 使用了React的useState和useNavigate Hook来进行状态管理和导航
  */
-const Register = () => {
+const RegisterPage = () => {
   // 定义loading状态，用于表示是否正在加载
   const [loading, setLoading] = useState(false);
   // 使用useNavigate Hook获取导航函数
@@ -174,4 +174,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default RegisterPage;

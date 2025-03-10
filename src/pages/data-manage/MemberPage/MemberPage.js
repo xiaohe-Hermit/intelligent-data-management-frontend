@@ -7,20 +7,20 @@ import {
   createMember,
   updateMember,
   deleteMember,
-} from "../services/memberApi";
+} from "../../../services/memberApi";
 import {
   getUserNameByUserId,
   getAllUserIdAndUserName,
-} from "../services/userApi";
-import { getAllRoleName } from "../services/roleApi";
-import CustomModal from "../components/Modal/CustomModal/CustomModal";
-import DataTable from "../components/DataTable/DataTable";
-import MemberForm from "../components/Form/MemberForm/MemberForm";
-import ConfirmDeleteModal from "../components/Modal/ConfirmDeleteModal/ConfirmDeleteModal";
-import useDeleteHandler from "../hooks/useDeleteHandler";
-import useDataManage from "../hooks/useDataManage";
+} from "../../../services/userApi";
+import { getAllRoleName } from "../../../services/roleApi";
+import CustomModal from "../../../components/Modal/CustomModal/CustomModal";
+import DataTable from "../../../components/DataTable/DataTable";
+import MemberForm from "../../../components/Form/MemberForm/MemberForm";
+import ConfirmDeleteModal from "../../../components/Modal/ConfirmDeleteModal/ConfirmDeleteModal";
+import useDeleteHandler from "../../../hooks/useDeleteHandler";
+import useDataManage from "../../../hooks/useDataManage";
 
-const Members = () => {
+const MembersPage = () => {
   const [members, setMembers] = useState([]);
   const [allUserIdAndUserName, setAllUserIdAndUserName] = useState([]);
   const [allRoleName, setAllRoleName] = useState([]);
@@ -239,4 +239,4 @@ const Members = () => {
   );
 };
 
-export default Members;
+export default MembersPage;

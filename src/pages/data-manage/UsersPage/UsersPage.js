@@ -6,16 +6,16 @@ import {
   createUser,
   updateUser,
   deleteUser,
-} from "../services/userApi";
-import { checkUsernameAndPhoneAvailability } from "../services/registerApi";
-import CustomModal from "../components/Modal/CustomModal/CustomModal";
-import UserForm from "../components/Form/UserForm/UserForm";
-import DataTable from "../components/DataTable/DataTable";
-import ConfirmDeleteModal from "../components/Modal/ConfirmDeleteModal/ConfirmDeleteModal";
-import useDeleteHandler from "../hooks/useDeleteHandler";
-import useDataManage from "../hooks/useDataManage";
+} from "../../../services/userApi";
+import { checkUsernameAndPhoneAvailability } from "../../../services/registerApi";
+import CustomModal from "../../../components/Modal/CustomModal/CustomModal";
+import UserForm from "../../../components/Form/UserForm/UserForm";
+import DataTable from "../../../components/DataTable/DataTable";
+import ConfirmDeleteModal from "../../../components/Modal/ConfirmDeleteModal/ConfirmDeleteModal";
+import useDeleteHandler from "../../../hooks/useDeleteHandler";
+import useDataManage from "../../../hooks/useDataManage";
 
-const Users = () => {
+const UsersPage = () => {
   const [users, setUsers] = useState([]);
   const [form] = Form.useForm();
 
@@ -148,4 +148,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default UsersPage;

@@ -2,27 +2,27 @@ import React, { useEffect, useState } from "react";
 import { Form, Button, message } from "antd";
 import dayjs from "dayjs"; // 确保导入 dayjs
 import {
-  getPatents,
-  createPatent,
-  updatePatent,
-  deletePatent,
-} from "../services/patentApi";
+  getSoftwareCopyrights,
+  createSoftwareCopyright,
+  updateSoftwareCopyright,
+  deleteSoftwareCopyright,
+} from "../../../services/softwareCopyrightApi";
 import {
   getUserNameByUserId,
   getAllUserIdAndUserName,
-} from "../services/userApi";
+} from "../../../services/userApi";
 import {
   getAllProjectIdAndProjectName,
   getProjectNameByProjectId,
-} from "../services/projectApi";
-import CustomModal from "../components/Modal/CustomModal/CustomModal";
-import DataTable from "../components/DataTable/DataTable";
-import PatentForm from "../components/Form/PatentForm/PatentForm";
-import ConfirmDeleteModal from "../components/Modal/ConfirmDeleteModal/ConfirmDeleteModal";
-import useDeleteHandler from "../hooks/useDeleteHandler";
-import useDataManage from "../hooks/useDataManage";
-const Patents = () => {
-  const [patents, setPatents] = useState([]);
+} from "../../../services/projectApi";
+import CustomModal from "../../../components/Modal/CustomModal/CustomModal";
+import DataTable from "../../../components/DataTable/DataTable";
+import SoftwareCopyrightForm from "../../../components/Form/SoftwareCopyrightForm/SoftwareCopyrightForm";
+import ConfirmDeleteModal from "../../../components/Modal/ConfirmDeleteModal/ConfirmDeleteModal";
+import useDeleteHandler from "../../../hooks/useDeleteHandler";
+import useDataManage from "../../../hooks/useDataManage";
+const SoftwareCopyrightsPage = () => {
+  const [softwareCopyrights, setSoftwareCopyrights] = useState([]);
   const [allUserIdAndUserName, setAllUserIdAndUserName] = useState([]);
   const [allProjectIdAndProjectName, setAllProjectIdAndProjectName] = useState(
     []
@@ -30,7 +30,7 @@ const Patents = () => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    fetchPatents();
+    fetchSoftwareCopyrights();
     fetchAllUserIdAndUserName();
     fetchAllProjectIdAndProjectName();
   }, []);
@@ -66,40 +66,40 @@ const Patents = () => {
     }
   };
 
-  // 修改后的 fetchPatents 函数
-  const fetchPatents = async () => {
+  // 修改后的 fetchSoftwareCopyrights 函数
+  const fetchSoftwareCopyrights = async () => {
     try {
-      const response = await getPatents();
+      const response = await getSoftwareCopyrights();
       if (Array.isArray(response)) {
-        const updatedPatents = await Promise.all(
-          response.map(async (patent) => {
-            if (patent.user_id) {
-              const userName = await getUserNameByUserId(patent.user_id);
+        const updatedSoftwareCopyrights = await Promise.all(
+          response.map(async (softwareCopyright) => {
+            if (softwareCopyright.user_id) {
+              const userName = await getUserNameByUserId(softwareCopyright.user_id);
               const projectName = await getProjectNameByProjectId(
-                patent.project_id
+                softwareCopyright.project_id
               );
               return {
-                ...patent,
+                ...softwareCopyright,
                 user_name: userName,
                 project_name: projectName,
               };
             } else {
               return {
-                ...patent,
+                ...softwareCopyright,
                 user_name: "无",
                 project_name: "无",
               };
             }
           })
         );
-        setPatents(updatedPatents);
+        setSoftwareCopyrights(updatedSoftwareCopyrights);
       } else {
-        setPatents([]);
-        message.error("获取专利数据格式不正确");
+        setSoftwareCopyrights([]);
+        message.error("获取软著数据格式不正确");
       }
     } catch (error) {
-      console.error("获取专利失败:", error);
-      message.error("获取专利失败，请重试");
+      console.error("获取软著失败:", error);
+      message.error("获取软著失败，请重试");
     }
   };
 
@@ -109,11 +109,11 @@ const Patents = () => {
     handleConfirmDelete,
     handleCancelDelete,
   } = useDeleteHandler({
-    deleteFunction: deletePatent,
-    fetchFunction: fetchPatents,
-    successMessage: "删除专利成功！",
-    errorMessage: "删除专利失败，请重试",
-    idField: "patent_id",
+    deleteFunction: deleteSoftwareCopyright,
+    fetchFunction: fetchSoftwareCopyrights,
+    successMessage: "删除软著成功！",
+    errorMessage: "删除软著失败，请重试",
+    idField: "copyright_id",
   });
 
   const dataFormatFunction = async (data) => {
@@ -129,7 +129,7 @@ const Patents = () => {
     }
     if (!data.project_id) {
       for (const project of allProjectIdAndProjectName) {
-        if (data.project_name == project.projectName) {
+        if (data.project_name === project.projectName) {
           projectId = project.projectId;
           break;
         }
@@ -146,26 +146,25 @@ const Patents = () => {
   const dateTypeFormatFunction = (record) => {
     const formattedRecord = {
       ...record,
-      application_date: dayjs(record.application_date),
-      authorization_date: dayjs(record.authorization_date),
-    };
+      registration_date: dayjs(record.registration_date),
+    };    
     return formattedRecord;
   };
 
   const {
     isModalOpen,
-    isAddingData: isAddingPatent,
+    isAddingData: isAddingSoftwareCopyright,
     handleCancel,
     handleEdit,
     handleAdd,
     handleFinish,
   } = useDataManage({
     form: form,
-    createFunction: createPatent,
-    updateFunction: updatePatent,
-    fetchFunction: fetchPatents,
-    dataName: "专利",
-    dataIdKey: "patent_id",
+    createFunction: createSoftwareCopyright,
+    updateFunction: updateSoftwareCopyright,
+    fetchFunction: fetchSoftwareCopyrights,
+    dataName: "软著",
+    dataIdKey: "copyright_id",
     hasFormatFunction: true,
     dataFormatFunction: dataFormatFunction,
     hasDateTypeAttribute: true,
@@ -174,25 +173,20 @@ const Patents = () => {
 
   const columns = [
     {
-      title: "专利名称",
-      dataIndex: "patent_name",
-      key: "patent_name",
+      title: "软著名称",
+      dataIndex: "software_name",
+      key: "software_name",
     },
 
     {
-      title: "专利号",
-      dataIndex: "patent_number",
-      key: "patent_number",
+      title: "版权号",
+      dataIndex: "copyright_number",
+      key: "copyright_number",
     },
     {
-      title: "申请日期",
-      dataIndex: "application_date",
-      key: "application_date",
-    },
-    {
-      title: "授权日期",
-      dataIndex: "authorization_date",
-      key: "authorization_date",
+      title: "注册时间",
+      dataIndex: "registration_date",
+      key: "registration_date",
     },
     {
       title: "描述",
@@ -200,7 +194,7 @@ const Patents = () => {
       key: "description",
     },
     {
-      title: "获得者",
+      title: "拥有者",
       dataIndex: "user_name",
       key: "user_name",
     },
@@ -228,21 +222,21 @@ const Patents = () => {
   return (
     <div>
       <DataTable
-        dataText="专利"
-        dataSource={patents}
+        dataText="软著"
+        dataSource={softwareCopyrights}
         columns={columns}
-        row_key="patent_id"
+        row_key="copyright_id"
         onClick={handleAdd}
       />
       <CustomModal
-        title={isAddingPatent ? "添加专利" : "更新专利"}
+        title={isAddingSoftwareCopyright ? "添加软著" : "更新软著"}
         open={isModalOpen}
         onCancel={handleCancel}
         onFinish={handleFinish}
         form={form}
-        submitButtonText={isAddingPatent ? "添加专利" : "更新专利"}
+        submitButtonText={isAddingSoftwareCopyright ? "添加软著" : "更新软著"}
       >
-        <PatentForm
+        <SoftwareCopyrightForm
           form={form}
           onFinish={handleFinish}
           allUserIdAndUserName={allUserIdAndUserName}
@@ -250,8 +244,8 @@ const Patents = () => {
         />
       </CustomModal>
       <ConfirmDeleteModal
-        title="删除专利"
-        description={`确定要删除该专利吗？`}
+        title="删除软著"
+        description={`确定要删除该软著吗？`}
         open={isDeleteModalOpen}
         onCancel={handleCancelDelete}
         onOk={handleConfirmDelete}
@@ -260,4 +254,4 @@ const Patents = () => {
   );
 };
 
-export default Patents;
+export default SoftwareCopyrightsPage;

@@ -2,28 +2,28 @@ import React, { useEffect, useState } from "react";
 import { Form, Button, message } from "antd";
 import dayjs from "dayjs"; // 确保导入 dayjs
 import {
-  getSalons,
-  createSalon,
-  updateSalon,
-  deleteSalon,
-} from "../services/salonApi";
+  getProjects,
+  createProject,
+  updateProject,
+  deleteProject,
+} from "../../../services/projectApi";
 import {
   getUserNameByUserId,
   getAllUserIdAndUserName,
-} from "../services/userApi";
-import CustomModal from "../components/Modal/CustomModal/CustomModal";
-import DataTable from "../components/DataTable/DataTable";
-import SalonForm from "../components/Form/SalonForm/SalonForm";
-import ConfirmDeleteModal from "../components/Modal/ConfirmDeleteModal/ConfirmDeleteModal";
-import useDeleteHandler from "../hooks/useDeleteHandler";
-import useDataManage from "../hooks/useDataManage";
-const Salons = () => {
-  const [salons, setSalons] = useState([]);
+} from "../../../services/userApi";
+import CustomModal from "../../../components/Modal/CustomModal/CustomModal";
+import DataTable from "../../../components/DataTable/DataTable";
+import ProjectForm from "../../../components/Form/ProjectForm/ProjectForm";
+import ConfirmDeleteModal from "../../../components/Modal/ConfirmDeleteModal/ConfirmDeleteModal";
+import useDeleteHandler from "../../../hooks/useDeleteHandler";
+import useDataManage from "../../../hooks/useDataManage";
+const ProjectsPage = () => {
+  const [projects, setProjects] = useState([]);
   const [allUserIdAndUserName, setAllUserIdAndUserName] = useState([]);
   const [form] = Form.useForm();
 
   useEffect(() => {
-    fetchSalons();
+    fetchProjects();
     fetchAllUserIdAndUserName();
   }, []);
   useEffect(() => {}, [form]);
@@ -43,35 +43,35 @@ const Salons = () => {
     }
   };
 
-  // 修改后的 fetchSalons 函数
-  const fetchSalons = async () => {
+  // 修改后的 fetchProjects 函数
+  const fetchProjects = async () => {
     try {
-      const response = await getSalons();
-      if (Array.isArray(response)) {
-        const updatedSalons = await Promise.all(
-          response.map(async (salon) => {
-            if (salon.organizer_id) {
-              const userName = await getUserNameByUserId(salon.organizer_id);
+      const response = await getProjects();
+      if (Array.isArray(response.data)) {
+        const updatedProjects = await Promise.all(
+          response.data.map(async (project) => {
+            if (project.manager_id) {
+              const userName = await getUserNameByUserId(project.manager_id);
               return {
-                ...salon,
-                organizer_name: userName,
+                ...project,
+                manager_name: userName,
               };
             } else {
               return {
-                ...salon,
-                organizer_name: "无",
+                ...project,
+                manager_name: "无",
               };
             }
           })
         );
-        setSalons(updatedSalons);
+        setProjects(updatedProjects);
       } else {
-        setSalons([]);
-        message.error("获取沙龙数据格式不正确");
+        setProjects([]);
+        message.error("获取项目数据格式不正确");
       }
     } catch (error) {
-      console.error("获取沙龙失败:", error);
-      message.error("获取沙龙失败，请重试");
+      console.error("获取项目失败:", error);
+      message.error("获取项目失败，请重试");
     }
   };
 
@@ -81,49 +81,50 @@ const Salons = () => {
     handleConfirmDelete,
     handleCancelDelete,
   } = useDeleteHandler({
-    deleteFunction: deleteSalon,
-    fetchFunction: fetchSalons,
-    successMessage: "删除沙龙成功！",
-    errorMessage: "删除沙龙失败，请重试",
-    idField: "salon_id",
+    deleteFunction: deleteProject,
+    fetchFunction: fetchProjects,
+    successMessage: "删除项目成功！",
+    errorMessage: "删除项目失败，请重试",
+    idField: "project_id",
   });
 
   const dataFormatFunction = async (data) => {
     let userId = null;
     for (const user of allUserIdAndUserName) {
-      if (data.organizer_name == user.userName) {
+      if (data.manager_name === user.userName) {
         userId = user.userId;
       }
     }
     const formattedData = {
       ...data,
-      organizer_id: userId,
+      manager_id: userId,
     };
-    const { organizer_name, ...finalData } = formattedData;
+    const { manager_name, ...finalData } = formattedData;
     return finalData;
   };
   const dateTypeFormatFunction = (record) => {
     const formattedRecord = {
       ...record,
-      salon_date: dayjs(record.salon_date),
+      start_date: dayjs(record.start_date),
+      end_date: dayjs(record.end_date),
     };
     return formattedRecord;
   };
 
   const {
     isModalOpen,
-    isAddingData: isAddingSalon,
+    isAddingData: isAddingProject,
     handleCancel,
     handleEdit,
     handleAdd,
     handleFinish,
   } = useDataManage({
     form: form,
-    createFunction: createSalon,
-    updateFunction: updateSalon,
-    fetchFunction: fetchSalons,
-    dataName: "沙龙",
-    dataIdKey: "salon_id",
+    createFunction: createProject,
+    updateFunction: updateProject,
+    fetchFunction: fetchProjects,
+    dataName: "项目",
+    dataIdKey: "project_id",
     hasFormatFunction: true,
     dataFormatFunction: dataFormatFunction,
     hasDateTypeAttribute: true,
@@ -132,30 +133,35 @@ const Salons = () => {
 
   const columns = [
     {
-      title: "沙龙名称",
-      dataIndex: "salon_name",
-      key: "salon_name",
+      title: "项目名称",
+      dataIndex: "project_name",
+      key: "project_name",
     },
 
     {
-      title: "举办时间",
-      dataIndex: "salon_date",
-      key: "salon_date",
+      title: "开始时间",
+      dataIndex: "start_date",
+      key: "start_date",
     },
     {
-      title: "地点",
-      dataIndex: "location",
-      key: "location",
+      title: "结束时间",
+      dataIndex: "end_date",
+      key: "end_date",
     },
     {
-      title: "描述",
+      title: "项目描述",
       dataIndex: "description",
       key: "description",
     },
     {
-      title: "沙龙负责人",
-      dataIndex: "organizer_name",
-      key: "organizer_name",
+      title: "项目负责人",
+      dataIndex: "manager_name",
+      key: "manager_name",
+    },
+    {
+      title: "项目状态",
+      dataIndex: "status",
+      key: "status",
     },
     {
       title: "Action",
@@ -176,29 +182,29 @@ const Salons = () => {
   return (
     <div>
       <DataTable
-        dataText="沙龙"
-        dataSource={salons}
+        dataText="项目"
+        dataSource={projects}
         columns={columns}
-        row_key="salon_id"
+        row_key="project_id"
         onClick={handleAdd}
       />
       <CustomModal
-        title={isAddingSalon ? "添加沙龙" : "更新沙龙"}
+        title={isAddingProject ? "添加项目" : "更新项目"}
         open={isModalOpen}
         onCancel={handleCancel}
         onFinish={handleFinish}
         form={form}
-        submitButtonText={isAddingSalon ? "添加沙龙" : "更新沙龙"}
+        submitButtonText={isAddingProject ? "添加项目" : "更新项目"}
       >
-        <SalonForm
+        <ProjectForm
           form={form}
           onFinish={handleFinish}
           allUserIdAndUserName={allUserIdAndUserName}
         />
       </CustomModal>
       <ConfirmDeleteModal
-        title="删除沙龙"
-        description={`确定要删除该沙龙吗？`}
+        title="删除项目"
+        description={`确定要删除该项目吗？`}
         open={isDeleteModalOpen}
         onCancel={handleCancelDelete}
         onOk={handleConfirmDelete}
@@ -207,4 +213,4 @@ const Salons = () => {
   );
 };
 
-export default Salons;
+export default ProjectsPage;

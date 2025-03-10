@@ -2,27 +2,27 @@ import React, { useEffect, useState } from "react";
 import { Form, Button, message } from "antd";
 import dayjs from "dayjs"; // 确保导入 dayjs
 import {
-  getAwards,
-  createAward,
-  updateAward,
-  deleteAward,
-} from "../services/awardApi";
+  getPublications,
+  createPublication,
+  updatePublication,
+  deletePublication,
+} from "../../../services/publicationApi";
 import {
   getUserNameByUserId,
   getAllUserIdAndUserName,
-} from "../services/userApi";
+} from "../../../services/userApi";
 import {
   getAllProjectIdAndProjectName,
   getProjectNameByProjectId,
-} from "../services/projectApi";
-import CustomModal from "../components/Modal/CustomModal/CustomModal";
-import DataTable from "../components/DataTable/DataTable";
-import AwardForm from "../components/Form/AwardForm/AwardForm";
-import ConfirmDeleteModal from "../components/Modal/ConfirmDeleteModal/ConfirmDeleteModal";
-import useDeleteHandler from "../hooks/useDeleteHandler";
-import useDataManage from "../hooks/useDataManage";
-const Awards = () => {
-  const [awards, setAwards] = useState([]);
+} from "../../../services/projectApi";
+import CustomModal from "../../../components/Modal/CustomModal/CustomModal";
+import DataTable from "../../../components/DataTable/DataTable";
+import PublicationForm from "../../../components/Form/PublicationForm/PublicationForm";
+import ConfirmDeleteModal from "../../../components/Modal/ConfirmDeleteModal/ConfirmDeleteModal";
+import useDeleteHandler from "../../../hooks/useDeleteHandler";
+import useDataManage from "../../../hooks/useDataManage";
+const PublicationsPage = () => {
+  const [publications, setPublications] = useState([]);
   const [allUserIdAndUserName, setAllUserIdAndUserName] = useState([]);
   const [allProjectIdAndProjectName, setAllProjectIdAndProjectName] = useState(
     []
@@ -31,7 +31,7 @@ const Awards = () => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    fetchAwards();
+    fetchPublications();
     fetchAllUserIdAndUserName();
     fetchAllProjectIdAndProjectName();
   }, []);
@@ -67,40 +67,40 @@ const Awards = () => {
     }
   };
 
-  // 修改后的 fetchAwards 函数
-  const fetchAwards = async () => {
+  // 修改后的 fetchPublications 函数
+  const fetchPublications = async () => {
     try {
-      const response = await getAwards();
+      const response = await getPublications();
       if (Array.isArray(response)) {
-        const updatedAwards = await Promise.all(
-          response.map(async (award) => {
-            if (award.user_id) {
-              const userName = await getUserNameByUserId(award.user_id);
+        const updatedPublications = await Promise.all(
+          response.map(async (publication) => {
+            if (publication.user_id) {
+              const userName = await getUserNameByUserId(publication.user_id);
               const projectName = await getProjectNameByProjectId(
-                award.project_id
+                publication.project_id
               );
               return {
-                ...award,
+                ...publication,
                 user_name: userName,
                 project_name: projectName,
               };
             } else {
               return {
-                ...award,
+                ...publication,
                 user_name: "无",
                 project_name: "无",
               };
             }
           })
         );
-        setAwards(updatedAwards);
+        setPublications(updatedPublications);
       } else {
-        setAwards([]);
-        message.error("获取奖项数据格式不正确");
+        setPublications([]);
+        message.error("获取出版物数据格式不正确");
       }
     } catch (error) {
-      console.error("获取奖项失败:", error);
-      message.error("获取奖项失败，请重试");
+      console.error("获取出版物失败:", error);
+      message.error("获取出版物失败，请重试");
     }
   };
 
@@ -110,11 +110,11 @@ const Awards = () => {
     handleConfirmDelete,
     handleCancelDelete,
   } = useDeleteHandler({
-    deleteFunction: deleteAward,
-    fetchFunction: fetchAwards,
-    successMessage: "删除奖项成功！",
-    errorMessage: "删除奖项失败，请重试",
-    idField: "award_id",
+    deleteFunction: deletePublication,
+    fetchFunction: fetchPublications,
+    successMessage: "删除出版物成功！",
+    errorMessage: "删除出版物失败，请重试",
+    idField: "publication_id",
   });
 
   const dataFormatFunction = async (data) => {
@@ -130,7 +130,7 @@ const Awards = () => {
     }
     if (!data.project_id) {
       for (const project of allProjectIdAndProjectName) {
-        if (data.project_name == project.projectName) {
+        if (data.project_name === project.projectName) {
           projectId = project.projectId;
           break;
         }
@@ -147,25 +147,25 @@ const Awards = () => {
   const dateTypeFormatFunction = (record) => {
     const formattedRecord = {
       ...record,
-      award_date: dayjs(record.award_date),
+      publish_date: dayjs(record.publish_date),
     };
     return formattedRecord;
   };
 
   const {
     isModalOpen,
-    isAddingData: isAddingAward,
+    isAddingData: isAddingPublication,
     handleCancel,
     handleEdit,
     handleAdd,
     handleFinish,
   } = useDataManage({
     form: form,
-    createFunction: createAward,
-    updateFunction: updateAward,
-    fetchFunction: fetchAwards,
-    dataName: "奖项",
-    dataIdKey: "award_id",
+    createFunction: createPublication,
+    updateFunction: updatePublication,
+    fetchFunction: fetchPublications,
+    dataName: "出版物",
+    dataIdKey: "publication_id",
     hasFormatFunction: true,
     dataFormatFunction: dataFormatFunction,
     hasDateTypeAttribute: true,
@@ -174,24 +174,25 @@ const Awards = () => {
 
   const columns = [
     {
-      title: "奖项名称",
-      dataIndex: "award_name",
-      key: "award_name",
+      title: "出版物标题",
+      dataIndex: "title",
+      key: "title",
+    },
+
+    {
+      title: "作者",
+      dataIndex: "authors",
+      key: "authors",
     },
     {
-      title: "获奖日期",
-      dataIndex: "award_date",
-      key: "award_date",
+      title: "出版日期",
+      dataIndex: "publish_date",
+      key: "publish_date",
     },
     {
-      title: "奖项级别",
-      dataIndex: "award_level",
-      key: "award_level",
-    },
-    {
-      title: "颁奖组织",
-      dataIndex: "award_organization",
-      key: "award_organization",
+      title: "出版社",
+      dataIndex: "publisher",
+      key: "publisher",
     },
     {
       title: "描述",
@@ -199,9 +200,9 @@ const Awards = () => {
       key: "description",
     },
     {
-      title: "获得者",
-      dataIndex: "user_name",
-      key: "user_name",
+      title: "用户ID",
+      dataIndex: "user_id",
+      key: "user_id",
     },
     {
       title: "项目名称",
@@ -227,30 +228,30 @@ const Awards = () => {
   return (
     <div>
       <DataTable
-        dataText="奖项"
-        dataSource={awards}
+        dataText="出版物"
+        dataSource={publications}
         columns={columns}
-        row_key="award_id"
+        row_key="publication_id"
         onClick={handleAdd}
       />
       <CustomModal
-        title={isAddingAward ? "添加奖项" : "更新奖项"}
+        title={isAddingPublication ? "添加出版物" : "更新出版物"}
         open={isModalOpen}
         onCancel={handleCancel}
         onFinish={handleFinish}
         form={form}
-        submitButtonText={isAddingAward ? "添加奖项" : "更新奖项"}
+        submitButtonText={isAddingPublication ? "添加出版物" : "更新出版物"}
       >
-        <AwardForm
+        <PublicationForm
           form={form}
           onFinish={handleFinish}
-          allProjectIdAndProjectName={allProjectIdAndProjectName}
           allUserIdAndUserName={allUserIdAndUserName}
+          allProjectIdAndProjectName={allProjectIdAndProjectName}
         />
       </CustomModal>
       <ConfirmDeleteModal
-        title="删除奖项"
-        description={`确定要删除该奖项吗？`}
+        title="删除出版物"
+        description={`确定要删除该出版物吗？`}
         open={isDeleteModalOpen}
         onCancel={handleCancelDelete}
         onOk={handleConfirmDelete}
@@ -259,4 +260,4 @@ const Awards = () => {
   );
 };
 
-export default Awards;
+export default PublicationsPage;

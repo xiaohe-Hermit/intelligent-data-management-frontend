@@ -2,36 +2,35 @@ import React, { useEffect, useState } from "react";
 import { Form, Button, message } from "antd";
 import dayjs from "dayjs"; // 确保导入 dayjs
 import {
-  getPublications,
-  createPublication,
-  updatePublication,
-  deletePublication,
-} from "../services/publicationApi";
+  getPatents,
+  createPatent,
+  updatePatent,
+  deletePatent,
+} from "../../../services/patentApi";
 import {
   getUserNameByUserId,
   getAllUserIdAndUserName,
-} from "../services/userApi";
+} from "../../../services/userApi";
 import {
   getAllProjectIdAndProjectName,
   getProjectNameByProjectId,
-} from "../services/projectApi";
-import CustomModal from "../components/Modal/CustomModal/CustomModal";
-import DataTable from "../components/DataTable/DataTable";
-import PublicationForm from "../components/Form/PublicationForm/PublicationForm";
-import ConfirmDeleteModal from "../components/Modal/ConfirmDeleteModal/ConfirmDeleteModal";
-import useDeleteHandler from "../hooks/useDeleteHandler";
-import useDataManage from "../hooks/useDataManage";
-const Publications = () => {
-  const [publications, setPublications] = useState([]);
+} from "../../../services/projectApi";
+import CustomModal from "../../../components/Modal/CustomModal/CustomModal";
+import DataTable from "../../../components/DataTable/DataTable";
+import PatentForm from "../../../components/Form/PatentForm/PatentForm";
+import ConfirmDeleteModal from "../../../components/Modal/ConfirmDeleteModal/ConfirmDeleteModal";
+import useDeleteHandler from "../../../hooks/useDeleteHandler";
+import useDataManage from "../../../hooks/useDataManage";
+const PatentsPage = () => {
+  const [patents, setPatents] = useState([]);
   const [allUserIdAndUserName, setAllUserIdAndUserName] = useState([]);
   const [allProjectIdAndProjectName, setAllProjectIdAndProjectName] = useState(
     []
   );
-
   const [form] = Form.useForm();
 
   useEffect(() => {
-    fetchPublications();
+    fetchPatents();
     fetchAllUserIdAndUserName();
     fetchAllProjectIdAndProjectName();
   }, []);
@@ -67,40 +66,40 @@ const Publications = () => {
     }
   };
 
-  // 修改后的 fetchPublications 函数
-  const fetchPublications = async () => {
+  // 修改后的 fetchPatents 函数
+  const fetchPatents = async () => {
     try {
-      const response = await getPublications();
+      const response = await getPatents();
       if (Array.isArray(response)) {
-        const updatedPublications = await Promise.all(
-          response.map(async (publication) => {
-            if (publication.user_id) {
-              const userName = await getUserNameByUserId(publication.user_id);
+        const updatedPatents = await Promise.all(
+          response.map(async (patent) => {
+            if (patent.user_id) {
+              const userName = await getUserNameByUserId(patent.user_id);
               const projectName = await getProjectNameByProjectId(
-                publication.project_id
+                patent.project_id
               );
               return {
-                ...publication,
+                ...patent,
                 user_name: userName,
                 project_name: projectName,
               };
             } else {
               return {
-                ...publication,
+                ...patent,
                 user_name: "无",
                 project_name: "无",
               };
             }
           })
         );
-        setPublications(updatedPublications);
+        setPatents(updatedPatents);
       } else {
-        setPublications([]);
-        message.error("获取出版物数据格式不正确");
+        setPatents([]);
+        message.error("获取专利数据格式不正确");
       }
     } catch (error) {
-      console.error("获取出版物失败:", error);
-      message.error("获取出版物失败，请重试");
+      console.error("获取专利失败:", error);
+      message.error("获取专利失败，请重试");
     }
   };
 
@@ -110,11 +109,11 @@ const Publications = () => {
     handleConfirmDelete,
     handleCancelDelete,
   } = useDeleteHandler({
-    deleteFunction: deletePublication,
-    fetchFunction: fetchPublications,
-    successMessage: "删除出版物成功！",
-    errorMessage: "删除出版物失败，请重试",
-    idField: "publication_id",
+    deleteFunction: deletePatent,
+    fetchFunction: fetchPatents,
+    successMessage: "删除专利成功！",
+    errorMessage: "删除专利失败，请重试",
+    idField: "patent_id",
   });
 
   const dataFormatFunction = async (data) => {
@@ -130,7 +129,7 @@ const Publications = () => {
     }
     if (!data.project_id) {
       for (const project of allProjectIdAndProjectName) {
-        if (data.project_name == project.projectName) {
+        if (data.project_name === project.projectName) {
           projectId = project.projectId;
           break;
         }
@@ -147,25 +146,26 @@ const Publications = () => {
   const dateTypeFormatFunction = (record) => {
     const formattedRecord = {
       ...record,
-      publish_date: dayjs(record.publish_date),
+      application_date: dayjs(record.application_date),
+      authorization_date: dayjs(record.authorization_date),
     };
     return formattedRecord;
   };
 
   const {
     isModalOpen,
-    isAddingData: isAddingPublication,
+    isAddingData: isAddingPatent,
     handleCancel,
     handleEdit,
     handleAdd,
     handleFinish,
   } = useDataManage({
     form: form,
-    createFunction: createPublication,
-    updateFunction: updatePublication,
-    fetchFunction: fetchPublications,
-    dataName: "出版物",
-    dataIdKey: "publication_id",
+    createFunction: createPatent,
+    updateFunction: updatePatent,
+    fetchFunction: fetchPatents,
+    dataName: "专利",
+    dataIdKey: "patent_id",
     hasFormatFunction: true,
     dataFormatFunction: dataFormatFunction,
     hasDateTypeAttribute: true,
@@ -174,25 +174,25 @@ const Publications = () => {
 
   const columns = [
     {
-      title: "出版物标题",
-      dataIndex: "title",
-      key: "title",
+      title: "专利名称",
+      dataIndex: "patent_name",
+      key: "patent_name",
     },
 
     {
-      title: "作者",
-      dataIndex: "authors",
-      key: "authors",
+      title: "专利号",
+      dataIndex: "patent_number",
+      key: "patent_number",
     },
     {
-      title: "出版日期",
-      dataIndex: "publish_date",
-      key: "publish_date",
+      title: "申请日期",
+      dataIndex: "application_date",
+      key: "application_date",
     },
     {
-      title: "出版社",
-      dataIndex: "publisher",
-      key: "publisher",
+      title: "授权日期",
+      dataIndex: "authorization_date",
+      key: "authorization_date",
     },
     {
       title: "描述",
@@ -200,9 +200,9 @@ const Publications = () => {
       key: "description",
     },
     {
-      title: "用户ID",
-      dataIndex: "user_id",
-      key: "user_id",
+      title: "获得者",
+      dataIndex: "user_name",
+      key: "user_name",
     },
     {
       title: "项目名称",
@@ -228,21 +228,21 @@ const Publications = () => {
   return (
     <div>
       <DataTable
-        dataText="出版物"
-        dataSource={publications}
+        dataText="专利"
+        dataSource={patents}
         columns={columns}
-        row_key="publication_id"
+        row_key="patent_id"
         onClick={handleAdd}
       />
       <CustomModal
-        title={isAddingPublication ? "添加出版物" : "更新出版物"}
+        title={isAddingPatent ? "添加专利" : "更新专利"}
         open={isModalOpen}
         onCancel={handleCancel}
         onFinish={handleFinish}
         form={form}
-        submitButtonText={isAddingPublication ? "添加出版物" : "更新出版物"}
+        submitButtonText={isAddingPatent ? "添加专利" : "更新专利"}
       >
-        <PublicationForm
+        <PatentForm
           form={form}
           onFinish={handleFinish}
           allUserIdAndUserName={allUserIdAndUserName}
@@ -250,8 +250,8 @@ const Publications = () => {
         />
       </CustomModal>
       <ConfirmDeleteModal
-        title="删除出版物"
-        description={`确定要删除该出版物吗？`}
+        title="删除专利"
+        description={`确定要删除该专利吗？`}
         open={isDeleteModalOpen}
         onCancel={handleCancelDelete}
         onOk={handleConfirmDelete}
@@ -260,4 +260,4 @@ const Publications = () => {
   );
 };
 
-export default Publications;
+export default PatentsPage;

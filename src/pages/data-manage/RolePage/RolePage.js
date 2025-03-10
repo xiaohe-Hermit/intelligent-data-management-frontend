@@ -6,15 +6,15 @@ import {
   createRole,
   updateRole,
   deleteRole,
-} from "../services/roleApi";
-import CustomModal from "../components/Modal/CustomModal/CustomModal";
-import RoleForm from "../components/Form/RoleForm/RoleForm";
-import DataTable from "../components/DataTable/DataTable";
-import ConfirmDeleteModal from "../components/Modal/ConfirmDeleteModal/ConfirmDeleteModal";
-import useDeleteHandler from "../hooks/useDeleteHandler";
-import useDataManage from "../hooks/useDataManage";
+} from "../../../services/roleApi";
+import CustomModal from "../../../components/Modal/CustomModal/CustomModal";
+import RoleForm from "../../../components/Form/RoleForm/RoleForm";
+import DataTable from "../../../components/DataTable/DataTable";
+import ConfirmDeleteModal from "../../../components/Modal/ConfirmDeleteModal/ConfirmDeleteModal";
+import useDeleteHandler from "../../../hooks/useDeleteHandler";
+import useDataManage from "../../../hooks/useDataManage";
 
-const Roles = () => {
+const RolesPage = () => {
   const [roles, setRoles] = useState([]);
   const [form] = Form.useForm();
 
@@ -130,4 +130,4 @@ const Roles = () => {
   );
 };
 
-export default Roles;
+export default RolesPage;

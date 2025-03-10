@@ -1,5 +1,5 @@
 import React from "react";
-import { Form, Select, DatePicker, Input } from "antd";
+import { Form, Select, Input } from "antd";
 
 const PhotoForm = ({
     form,
