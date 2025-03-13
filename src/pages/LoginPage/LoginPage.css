@@ -1,0 +1,94 @@
+.login-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.promotion-section {
+    flex: 1;
+    background: #f0f7ff;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.brand h1 {
+    font-size: 36px;
+    color: #1890ff;
+    margin-bottom: 16px;
+}
+
+.slogan {
+    color: #666;
+    font-size: 16px;
+}
+
+.graphic {
+    width: 400px;
+    height: 300px;
+    background: #e6f7ff;
+    border-radius: 8px;
+    /* 这里可以替换为实际3D图形或背景图 */
+}
+
+.login-form-section {
+    width: 480px;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.form-title {
+    text-align: center;
+    margin-bottom: 40px;
+    color: rgba(0, 0, 0, 0.85);
+}
+
+.captcha-input {
+    display: flex;
+    gap: 16px;
+}
+
+.captcha-input .ant-input-affix-wrapper {
+    flex: 1;
+}
+
+.additional-links {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 40px;
+    color: rgba(0, 0, 0, 0.45);
+}
+
+.login-tabs {
+    width: 100%;
+}
+
+.login-tabs .ant-tabs-nav {
+    margin-bottom: 40px;
+}
+
+.login-tabs .ant-tabs-tab {
+    font-size: 16px;
+    padding: 12px 24px;
+}
+
+.login-tabs .ant-tabs-tab-active {
+    color: #1890ff;
+}
+
+.login-tabs .ant-tabs-ink-bar {
+    background: #1890ff;
+}

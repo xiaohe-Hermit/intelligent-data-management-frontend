@@ -1,12 +1,18 @@
 // src/pages/Register.js
-import React, { useState , useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Form, Input, Button, message } from "antd";
-import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import {
+  UserOutlined,
+  MailOutlined,
+  LockOutlined,
+  MobileOutlined,
+} from "@ant-design/icons";
 import { useNavigate, Link } from "react-router-dom"; // 导入 Link 组件
 import {
   register,
   checkUsernameAndPhoneAvailability,
 } from "../../services/registerApi"; // 假设有一个注册 API 和唯一性检查 API
+import './RegisterPage.css';
 
 /**
  * 注册组件
@@ -16,6 +22,7 @@ import {
 const RegisterPage = () => {
   // 定义loading状态，用于表示是否正在加载
   const [loading, setLoading] = useState(false);
+  const [countdown, setCountdown] = useState(0);
   // 使用useNavigate Hook获取导航函数
   const navigate = useNavigate();
   // 使用useRef获取Form实例
@@ -92,50 +99,163 @@ const RegisterPage = () => {
     }
   };
 
+  // 验证码倒计时（保持与登录页相同逻辑）
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
+
   // 渲染注册页面
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-      }}
-    >
-      <div style={{ width: 300 }}>
-        <h1 style={{ textAlign: "center", marginBottom: 24 }}>注册</h1>
+    // <div
+    //   style={{
+    //     display: "flex",
+    //     justifyContent: "center",
+    //     alignItems: "center",
+    //     height: "100vh",
+    //   }}
+    // >
+    //   <div style={{ width: 300 }}>
+    //     <h1 style={{ textAlign: "center", marginBottom: 24 }}>注册</h1>
+    //     <Form
+    //       ref={formRef}
+    //       name="register-form"
+    //       initialValues={{ remember: true }}
+    //       onFinish={onFinish}
+    //     >
+    //       <Form.Item
+    //         name="username"
+    //         rules={[{ required: true, message: "请输入用户名" }]}
+    //       >
+    //         <Input prefix={<UserOutlined />} placeholder="用户名" />
+    //       </Form.Item>
+
+    //       <Form.Item
+    //         name="phone"
+    //         rules={[
+    //           { required: true, message: "请输入手机号" },
+    //           { pattern: /^1[3-9]\d{9}$/, message: "请输入有效的手机号" },
+    //         ]}
+    //       >
+    //         <Input prefix={<UserOutlined />} placeholder="手机号" />
+    //       </Form.Item>
+
+    //       <Form.Item
+    //         name="password"
+    //         rules={[
+    //           { required: true, message: "请输入密码" },
+    //           { min: 6, message: "密码至少6位" },
+    //         ]}
+    //         hasFeedback
+    //       >
+    //         <Input.Password prefix={<LockOutlined />} placeholder="密码" />
+    //       </Form.Item>
+
+    //       <Form.Item
+    //         name="confirm"
+    //         dependencies={["password"]}
+    //         hasFeedback
+    //         rules={[
+    //           { required: true, message: "请确认密码" },
+    //           ({ getFieldValue }) => ({
+    //             validator(_, value) {
+    //               if (!value || getFieldValue("password") === value) {
+    //                 return Promise.resolve();
+    //               }
+    //               return Promise.reject(new Error("两次输入的密码不一致!"));
+    //             },
+    //           }),
+    //         ]}
+    //       >
+    //         <Input.Password prefix={<LockOutlined />} placeholder="确认密码" />
+    //       </Form.Item>
+
+    //       <Form.Item>
+    //         <Button type="primary" htmlType="submit" loading={loading} block>
+    //           注册
+    //         </Button>
+    //       </Form.Item>
+    //     </Form>
+    //     {/* 添加跳转至登录页面的按钮 */}
+    //     <div style={{ textAlign: "center", marginTop: 16 }}>
+    //       <Link to="/login">
+    //         <Button type="link">已有账号？去登录</Button>
+    //       </Link>
+    //     </div>
+    //   </div>
+    // </div>
+    <div className="register-container">
+      {/* 左侧注册表单 */}
+      <div className="register-form-section">
         <Form
+          // form={form}
           ref={formRef}
-          name="register-form"
-          initialValues={{ remember: true }}
+          name="register"
           onFinish={onFinish}
+          scrollToFirstError
         >
+          <h2 className="form-title">注册账号</h2>
+
           <Form.Item
             name="username"
-            rules={[{ required: true, message: "请输入用户名" }]}
+            rules={[{ required: true, message: "请输入用户名!" }]}
           >
-            <Input prefix={<UserOutlined />} placeholder="用户名" />
+            <Input
+              prefix={<UserOutlined />}
+              placeholder="请输入用户名"
+              size="large"
+            />
           </Form.Item>
 
           <Form.Item
             name="phone"
             rules={[
-              { required: true, message: "请输入手机号" },
-              { pattern: /^1[3-9]\d{9}$/, message: "请输入有效的手机号" },
+              { required: true, message: "请输入手机号!" },
+              { len: 11, message: "请输入11位手机号" },
             ]}
           >
-            <Input prefix={<UserOutlined />} placeholder="手机号" />
+            <Input
+              prefix={<MobileOutlined />}
+              placeholder="请输入11位手机号"
+              size="large"
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="captcha"
+            rules={[{ required: true, message: "请输入验证码!" }]}
+          >
+            <div className="captcha-input">
+              <Input
+                prefix={<MailOutlined />}
+                placeholder="请输入短信验证码"
+                size="large"
+              />
+              <Button
+                type="primary"
+                size="large"
+                disabled={countdown > 0}
+                onClick={() => setCountdown(60)}
+              >
+                {countdown ? `${countdown}秒后重试` : "获取验证码"}
+              </Button>
+            </div>
           </Form.Item>
 
           <Form.Item
             name="password"
             rules={[
-              { required: true, message: "请输入密码" },
-              { min: 6, message: "密码至少6位" },
+              { required: true, message: "请输入密码!" },
+              { min: 8, message: "密码至少8位" },
             ]}
-            hasFeedback
           >
-            <Input.Password prefix={<LockOutlined />} placeholder="密码" />
+            <Input.Password
+              prefix={<LockOutlined />}
+              placeholder="请输入密码（至少8位）"
+              size="large"
+            />
           </Form.Item>
 
           <Form.Item
@@ -158,17 +278,30 @@ const RegisterPage = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading} block>
-              注册
+            <Button type="primary" htmlType="submit" block size="large">
+              立即注册
             </Button>
           </Form.Item>
+
+          <div style={{ textAlign: "center", marginTop: 16 }}>
+            <Link to="/login">
+              <Button type="link">已有账号？去登录</Button>
+            </Link>
+          </div>
         </Form>
-        {/* 添加跳转至登录页面的按钮 */}
-        <div style={{ textAlign: "center", marginTop: 16 }}>
-          <Link to="/login">
-            <Button type="link">已有账号？去登录</Button>
-          </Link>
+
+        <div className="footer">
+          <p>lab-master.com 版权所有 ©2025</p>
         </div>
+      </div>
+
+      {/* 右侧宣传区（保持与登录页一致） */}
+      <div className="promotion-section">
+        <div className="brand">
+          <h1>智研LabMaster</h1>
+          <p className="slogan">智能实验室科研数据协同管理平台</p>
+        </div>
+        <div className="graphic"></div>
       </div>
     </div>
   );

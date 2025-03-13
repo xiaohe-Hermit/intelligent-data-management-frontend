@@ -1,0 +1,50 @@
+.dashboard-container {
+    padding: 24px;
+    background: #fff;
+}
+
+.status-row {
+    margin-bottom: 24px;
+}
+
+.status-card.blue {
+    background: #e6f7ff;
+    border-color: #91d5ff;
+}
+
+.ant-statistic-title {
+    font-size: 16px !important;
+}
+
+.device-status {
+    padding: 20px;
+}
+
+.status-item {
+    margin: 16px 0;
+    padding: 12px;
+    background: #fafafa;
+    border-radius: 4px;
+}
+
+.chart-row {
+    margin-top: 24px;
+}
+
+.quick-actions .action-btn {
+    height: 48px;
+    margin: 8px 0;
+    font-size: 16px;
+    border-color: #1890ff;
+    color: #1890ff;
+}
+
+.quick-actions .action-btn:hover {
+    background: #e6f7ff;
+}
+
+/* 图表容器样式 */
+.ant-card .ant-card-head-title {
+    font-weight: bold;
+    font-size: 16px;
+}

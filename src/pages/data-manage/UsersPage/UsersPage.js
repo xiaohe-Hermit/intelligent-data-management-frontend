@@ -20,14 +20,13 @@ const UsersPage = () => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    fetchUsers();
+    fetchUsers();    
   }, []);
   useEffect(() => {}, [form]);
 
-  const fetchUsers = () => {
-    getUsers().then((response) => {
-      setUsers(response.data);
-    });
+  const fetchUsers = async () => {
+    const response =  await getUsers();
+    setUsers(response.data);
   };
 
   const {

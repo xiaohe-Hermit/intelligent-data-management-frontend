@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, Button, message } from "antd";
+import { Form, Button, message, Upload, Input } from "antd";
 import {
   getPhotos,
   createPhoto,
@@ -20,6 +20,11 @@ import PhotoForm from "../../../components/Form/PhotoForm/PhotoForm";
 import ConfirmDeleteModal from "../../../components/Modal/ConfirmDeleteModal/ConfirmDeleteModal";
 import useDeleteHandler from "../../../hooks/useDeleteHandler";
 import useDataManage from "../../../hooks/useDataManage";
+import { InboxOutlined } from "@ant-design/icons";
+import { uploadImg, getImg } from "../../../services/imgUploadApi";
+
+const { Dragger } = Upload;
+
 const PhotosPage = () => {
   const [photos, setPhotos] = useState([]);
   const [allUserIdAndUserName, setAllUserIdAndUserName] = useState([]);
@@ -27,6 +32,9 @@ const PhotosPage = () => {
     []
   );
   const [form] = Form.useForm();
+  // 状态管理
+  const [imageUrl, setImageUrl] = useState("");
+  const [imageInfo, setImageInfo] = useState(null);
 
   useEffect(() => {
     fetchPhotos();
@@ -117,8 +125,8 @@ const PhotosPage = () => {
 
   const dataFormatFunction = async (data) => {
     let userId = data.user_id || null;
-    let projectId = data.project_id || null;    
-    if (!data.user_id) {                
+    let projectId = data.project_id || null;
+    if (!data.user_id) {
       for (const user of allUserIdAndUserName) {
         if (data.user_name === user.userName) {
           userId = user.userId;
@@ -139,7 +147,7 @@ const PhotosPage = () => {
       user_id: userId,
       project_id: projectId,
     };
-    const {...finalData } = formattedData;
+    const { ...finalData } = formattedData;
     return finalData;
   };
 
@@ -204,8 +212,102 @@ const PhotosPage = () => {
     },
   ];
 
+  // 文件上传成功的回调函数
+  const handleUploadSuccess = (info) => {
+    message.success(`${info.file.name} 文件上传成功`);
+  };
+
+  // 文件上传失败的回调函数
+  const handleUploadError = (info) => {
+    message.error(`${info.file.name} 文件上传失败`);
+  };
+
+  // 自定义上传请求
+  const customRequest = async ({ file, onSuccess, onError }) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      await uploadImg(formData);
+      onSuccess("OK");
+    } catch (error) {
+      onError(error);
+    }
+  };
+
+  // 上传属性配置
+  const props = {
+    name: "file",
+    multiple: true,
+    customRequest: customRequest,
+    onChange(info) {
+      const { status } = info.file;
+      if (status !== "uploading") {
+        console.log(info.file, info.fileList);
+      }
+      if (status === "done") {
+        handleUploadSuccess(info);
+      } else if (status === "error") {
+        handleUploadError(info);
+      }
+    },
+  };
+
+  // 处理表单提交
+  const handleFormSubmit = async (values) => {
+    const { imageUrl } = values;
+    try {
+      const response = await getImg(imageUrl);
+      setImageInfo(response);
+      setImageUrl(response.imageUrl);
+    } catch (error) {
+      message.error("获取图片信息失败");
+    }
+  };
+
   return (
     <div>
+      <Dragger {...props}>
+        <p className="ant-upload-drag-icon">
+          <InboxOutlined />
+        </p>
+        <p className="ant-upload-text">点击或拖拽文件到此区域上传</p>
+        <p className="ant-upload-hint">支持单个或批量上传</p>
+      </Dragger>
+
+      <div style={{ marginTop: 24 }}>
+        <Form onFinish={handleFormSubmit}>
+          <Form.Item
+            name="imageUrl"
+            label="图片URL"
+            rules={[{ required: true, message: "请输入图片URL" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              获取图片信息
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
+
+      {imageInfo && (
+        <div style={{ marginTop: 24 }}>
+          <h3>图片信息</h3>
+          <pre>{JSON.stringify(imageInfo, null, 2)}</pre>
+          <pre>{imageUrl}</pre>
+          <img
+            alt="Uploaded"
+            src="https://intellect-data-management.tos-cn-guangzhou.volces.com/avatar/default_avatar.jpeg"
+          ></img>
+          <img
+            src={imageUrl}
+            alt="Uploaded"
+            style={{ maxWidth: "100%", marginTop: 16 }}
+          />
+        </div>
+      )}
       <DataTable
         dataText="照片"
         dataSource={photos}

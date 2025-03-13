@@ -1,0 +1,50 @@
+.register-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.register-form-section {
+    width: 480px;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: #fff;
+}
+
+.promotion-section {
+    flex: 1;
+    background: #f0f7ff;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 复用登录页样式 */
+.form-title {
+    text-align: center;
+    margin-bottom: 40px;
+    color: rgba(0, 0, 0, 0.85);
+    font-size: 24px;
+}
+
+.captcha-input {
+    display: flex;
+    gap: 16px;
+}
+
+.additional-links {
+    text-align: center;
+    margin-top: 16px;
+}
+
+/* 新增注册页特定样式 */
+.register-form-section .ant-form-item {
+    margin-bottom: 24px;
+}
+
+.register-form-section .ant-input-affix-wrapper {
+    padding: 12px 11px;
+}

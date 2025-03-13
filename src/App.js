@@ -1,6 +1,16 @@
 // src/App.js
 import React, { useState } from "react";
-import { Layout, Menu, Avatar, Button, Input, Dropdown, Space, Switch, message } from "antd";
+import {
+  Layout,
+  Menu,
+  Avatar,
+  Button,
+  Input,
+  Dropdown,
+  Space,
+  Switch,
+  message,
+} from "antd";
 import {
   BrowserRouter as Router,
   Route,
@@ -12,6 +22,8 @@ import {
 import Dashboard from "./pages/Dashboard/Dashboard";
 import LoginPage from "./pages/LoginPage/LoginPage";
 import RegisterPage from "./pages/RegisterPage/RegisterPage";
+import ProfilePage from "./pages/ProfilePage/ProfilePage";
+// import SettingPage from "./pages/SettingPage/SettingPage";
 import UsersPage from "./pages/data-manage/UsersPage/UsersPage";
 import RolesPage from "./pages/data-manage/RolePage/RolePage";
 import SalonsPage from "./pages/data-manage/SalonPage/SalonPage";
@@ -23,10 +35,17 @@ import PatentsPage from "./pages/data-manage/PatentPage/PatentPage";
 import PermissionsPage from "./pages/data-manage/PermissionPage/PermissionPage";
 import ProjectsPage from "./pages/data-manage/ProjectPage/ProjectPage";
 import SoftwareCopyrightsPage from "./pages/data-manage/SoftwareCopyrightPage/SoftwareCopyrightPage";
-import DataOverviewPage from "./pages/data-vision/DataOverviewPage/DataOverviewPage"; 
-import DataVisualizationPage from "./pages/data-vision/DataVisualizationPage/DataVisualizationPage"; 
+import DataOverviewPage from "./pages/data-vision/DataOverviewPage/DataOverviewPage";
+import DataVisualizationPage from "./pages/data-vision/DataVisualizationPage/DataVisualizationPage";
 import { useNavigate } from "react-router-dom";
-import { SearchOutlined, BellOutlined, CalendarOutlined, DownOutlined, UpOutlined, SettingOutlined } from "@ant-design/icons";
+import {
+  SearchOutlined,
+  BellOutlined,
+  CalendarOutlined,
+  DownOutlined,
+  UpOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
 
 const { Header, Content, Sider } = Layout;
 
@@ -133,7 +152,12 @@ function App() {
           />
         </Sider>
         <Layout>
-          <AppHeader user={user} onLogout={() => setIsLoggedIn(false)} isDarkTheme={isDarkTheme} onToggleTheme={() => setIsDarkTheme(!isDarkTheme)} />
+          <AppHeader
+            user={user}
+            onLogout={() => setIsLoggedIn(false)}
+            isDarkTheme={isDarkTheme}
+            onToggleTheme={() => setIsDarkTheme(!isDarkTheme)}
+          />
           <Content style={{ margin: "24px 16px 0" }}>
             <div style={{ padding: 24, background: "#fff", minHeight: 360 }}>
               <Outlet /> {/* 子路由的内容将在这里渲染 */}
@@ -173,7 +197,10 @@ function App() {
         >
           <Route index element={<Dashboard />} />
           <Route path="overview/data-overview" element={<DataOverviewPage />} />
-          <Route path="overview/data-visualization" element={<DataVisualizationPage />} />
+          <Route
+            path="overview/data-visualization"
+            element={<DataVisualizationPage />}
+          />
           <Route path="users" element={<UsersPage />} />
           <Route path="roles" element={<RolesPage />} />
           <Route path="permissions" element={<PermissionsPage />} />
@@ -184,7 +211,12 @@ function App() {
           <Route path="publications" element={<PublicationsPage />} />
           <Route path="patents" element={<PatentsPage />} />
           <Route path="salons" element={<SalonsPage />} />
-          <Route path="software-copyrights" element={<SoftwareCopyrightsPage />} />
+          <Route
+            path="software-copyrights"
+            element={<SoftwareCopyrightsPage />}
+          />
+          <Route path="profile" element={<ProfilePage />} />
+          {/* <Route path="settings" element={<SettingPage />} /> */}
         </Route>
       </Routes>
     </Router>
@@ -212,10 +244,10 @@ const AppHeader = ({ user, onLogout, isDarkTheme, onToggleTheme }) => {
       key: "1",
       label: <Link to="/profile">个人资料</Link>,
     },
-    {
-      key: "2",
-      label: <Link to="/settings">设置</Link>,
-    },
+    // {
+    //   key: "2",
+    //   label: <Link to="/settings">设置</Link>,
+    // },
     {
       key: "3",
       label: "退出登录",
@@ -242,14 +274,31 @@ const AppHeader = ({ user, onLogout, isDarkTheme, onToggleTheme }) => {
           prefix={<SearchOutlined />}
         />
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 24, flex: 1 }}>
-        <Button icon={<BellOutlined />} onClick={() => message.info("消息通知")} />
-        <Button icon={<CalendarOutlined />} onClick={() => message.info("日程安排")} />
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 24,
+          flex: 1,
+          justifyContent: "flex-end",
+        }}
+      >
+        <Button
+          icon={<BellOutlined />}
+          onClick={() => message.info("消息通知")}
+          style={{ fontSize: 14, padding: "0 12px" }}
+        />
+        <Button
+          icon={<CalendarOutlined />}
+          onClick={() => message.info("日程安排")}
+          style={{ fontSize: 14, padding: "0 12px" }}
+        />
         <Switch
           checked={isDarkTheme}
           onChange={onToggleTheme}
           checkedChildren={<SettingOutlined />}
           unCheckedChildren={<SettingOutlined />}
+          style={{ fontSize: 14 }}
         />
         <Dropdown
           menu={{ items: menuItems }}
@@ -262,15 +311,21 @@ const AppHeader = ({ user, onLogout, isDarkTheme, onToggleTheme }) => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              padding: "0 12px",
+              padding: "5px 12px",
               backgroundColor: isDarkTheme ? "#1890ff" : "#f0f0f0", // 根据主题调整背景颜色
               color: isDarkTheme ? "#fff" : "#000", // 根据主题调整文字颜色
               transition: "background-color 0.3s ease, color 0.3s ease", // 添加背景颜色和文字颜色过渡效果
             }}
           >
-            <Space>
-              <Avatar src={user.avatar} size="small" />
-              <div style={{ textAlign: "left" }}>
+            <Space >
+              <Avatar
+                src={
+                  user.avatar ||
+                  "https://intellect-data-management.tos-cn-guangzhou.volces.com/avatar/default_avatar.jpeg"
+                }
+                size="large"
+              />
+              <div style={{ textAlign: "left" ,margin: "10px" }}>
                 <div>{user.name}</div>
                 <div>{user.role}</div>
               </div>
